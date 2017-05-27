@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <style type="text/css">
-    
+
 </style>
 <h1>下载试题</h1>
 <div class="panel panel-primary">
@@ -91,8 +91,7 @@
                     <th>操作</th>
                 </tr>
             </thead>
-            <tbody id="Content">
-            </tbody>
+            <tbody id="Content"></tbody>
         </table>
     </div>
     <div class="panel-footer">
@@ -101,13 +100,12 @@
     </div>
 </div>
 <script type="text/javascript">
-    function Add()
-    {
+    function Add() {
         var questiontype = $("#questiontype").find("option:selected").val()
         var questiontypename = $("#questiontype").find("option:selected").text()
         var questioncount = $("#questioncount").val()
         var score = $("#score").val()
-        var totalscore = $("#totalscore").val()        
+        var totalscore = $("#totalscore").val()
         var warningword = ""
         var flag = true
         if (questiontype == 0) {
@@ -115,62 +113,51 @@
             warningword += "【题型】"
             flag = false
         }
-        else
-        {
+        else {
             $("#questiontype").parent().attr("class", "col-md-2 form-group")
         }
-        if (questioncount == ""||questioncount == 0)
-        {
+        if (questioncount == "" || questioncount == 0) {
             $("#questioncount").parent().attr("class", "col-md-2 form-group has-error")
             warningword += "【题量】"
             flag = false
         }
-        else
-        {
+        else {
             $("#questioncount").parent().attr("class", "col-md-2 form-group")
         }
-        if (score == ""||score == 0)
-        {
+        if (score == "" || score == 0) {
             $("#score").parent().attr("class", "col-md-2 form-group has-error")
             warningword += "【分值】"
             flag = false
         }
-        else
-        {
+        else {
             $("#score").parent().attr("class", "col-md-2 form-group")
         }
-        if (totalscore == "" || totalscore == 0)
-        {
+        if (totalscore == "" || totalscore == 0) {
             $("#totalscore").parent().attr("class", "col-md-2 form-group has-error")
             warningword += "【总分】"
             flag = false
         }
-        else
-        {
+        else {
             $("#totalscore").parent().attr("class", "col-md-2 form-group")
         }
-        if (flag == false)
-        {
-            
+        if (flag == false) {
+
             $("#warning").html(warningword + "有错误")
             $("#warning").removeAttr("hidden")
             return
         }
-        else
-        {
+        else {
             $("#warning").html("")
             $("#warning").attr("hidden", "hidden")
         }
         var totalscorebycaculate = 0
         $.each(score.split(','), function (i, val) {
-            totalscorebycaculate+=parseInt(val)
+            totalscorebycaculate += parseInt(val)
         })
-        if (score.split(',').length == 1)
-        {
-            totalscorebycaculate = parseInt(score)*parseInt(questioncount)
+        if (score.split(',').length == 1) {
+            totalscorebycaculate = parseInt(score) * parseInt(questioncount)
         }
-        if (totalscorebycaculate != totalscore)
-        {
+        if (totalscorebycaculate != totalscore) {
             $("#warning").html("【数量】【每题分值】【总分】 不匹配")
             $("#warning").removeAttr("hidden")
             return
@@ -179,8 +166,7 @@
             $("#warning").html("")
             $("#warning").attr("hidden", "hidden")
         }
-        if (score.split(',').length != 1 && score.split(',').length != parseInt(questioncount))
-        {
+        if (score.split(',').length != 1 && score.split(',').length != parseInt(questioncount)) {
             $("#warning").html("【数量】【每题分值】 不匹配")
             $("#warning").removeAttr("hidden")
             return
@@ -201,12 +187,11 @@
         var total_count = $("#total_count").text().split("：")[1]
         var total_score = $("#total_score").text().split("：")[1]
         total_count = parseInt(total_count) + parseInt(questioncount)
-        total_score = parseInt(total_score)+parseInt(totalscore)
+        total_score = parseInt(total_score) + parseInt(totalscore)
         $("#total_count").text("总数：" + total_count)
         $("#total_score").text("总分：" + total_score)
     }
-    function Create()
-    {
+    function Create() {
         var paperlist = []
         var obj = $("#Content")
         obj.children("tr").each(function () {
@@ -235,8 +220,6 @@
             //data: JSON.stringify(paperlist),
             beforeSend: function () {
                 $("#create").text("正在生成")
-                //$("#submit").val("正在登录中")
-                //$("#submit").attr("disabled", "disabled")
             },
             success: function (result) {
                 alert("生成成功")
@@ -254,8 +237,7 @@
             }
         })
     }
-    function Del(obj)
-    {
+    function Del(obj) {
         $(obj).parent().parent().remove()
     }
 </script>
