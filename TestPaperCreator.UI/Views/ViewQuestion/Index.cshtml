@@ -1,0 +1,211 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>试题管理</h1>
+@*@foreach(var i in ViewBag.questionlist)
+    {
+        <div>@i.ID , @i.Type , @i.Course , @i.Section , @i.Difficulty </div>
+        <br />
+    }*@
+<style>
+    td, th {
+        color: black;
+    }
+
+        td.details-control {
+            background: url('../../images/details_open.png') no-repeat center center;
+            cursor: pointer;
+        }
+
+    tr.shown td.details-control {
+        background: url('../../images/details_close.png') no-repeat center center;
+    }
+    iframe{
+        width:inherit;
+    }
+</style>
+<div class="panel panel-primary">
+    <div class="panel-heading">试题管理</div>
+    <div class="panel-body" style="color:black">
+        <table id="table_local" class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th hidden="hidden">ID</th>
+                    <th>科目</th>
+                    <th>章节</th>
+                    <th>题型</th>
+                    <th>难度</th>
+                    <th hidden="hidden">内容</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    function format(d) {
+        var width = $("#table_local").innerWidth()
+        var iframewidth = parseInt(width) / 2-16;//padding有8*2的宽度
+        var str = getAttarchmentPath(d) + '/files/';
+        var iframepageid = "iframepage" + d.ID.toString()
+        var res = verifyurl(str + d.ID.toString() + '.html')
+        if (verifyurl(str + d.ID.toString()+'.html') == 'error')
+        {
+            result = '没有文件'
+        }
+        else
+        {
+            var result = '<tr><th style="width:' + iframewidth + 'px" >题干</th><th style="width:' + iframewidth + 'px" >答案</th></tr><tr><td style="width:' + iframewidth + 'px"><iframe id="' + iframepageid + '" frameborder="1" scrolling="no" marginheight="0" width="' + iframewidth + '" height="200" marginwidth="0" src="' + str + d.ID.toString() + '.html"></iframe></td>' +
+            '<td style="width:' + iframewidth + 'px"><iframe id="' + iframepageid + '_answer" frameborder="1" scrolling="no" marginheight="0" height="200" width = "' + iframewidth + '" marginwidth="0" src="' + str + d.ID.toString() + '_answer.html"></iframe></td></tr>';
+        }
+       
+        return result
+    }
+    $(document).ready(function () {
+        var table = $("#table_local").DataTable({
+            ajax: {
+                "url": "/api/ViewQuestionAPI/GetQuestionList/",
+                "type": "GET",
+                //"dataType": "application/json",
+                "data": {},
+            },
+            "columns": [
+            {
+                "className":"details-control",
+                "orderable": false,
+                "data": null,
+                "defaultContent": ''
+            },
+            {
+                "data": "ID",
+                "className":"hidden"
+            },
+            { "data": "CourseName" },
+            { "data": "SectionName" },
+            { "data": "TypeName" },
+            { "data": "DifficultyName" },
+            {
+                "className": "hidden",
+                "data": "Content"
+            },
+            {
+                "data": null,
+                "defaultContent": '<button class="btn btn-success" type="button" this>下载</button><button class="btn btn-warning" type="button" this>删除</button>'
+            },
+            ],
+            "order": [[1, 'asc']],
+            bAutoWidth: false,                   //是否启用自动适应列宽
+            paging: true,//分页
+            pagingType: "full_numbers",//分页样式的类型
+            //"order": [[ 1, 'asc' ]],
+            ordering: true,//是否启用排序
+            searching: true,//搜索
+            language: {
+                lengthMenu: '<select class="form-control input-md">' + '<option value="1">1</option>' + '<option value="10">10</option>' + '<option value="20">20</option>' + '<option value="30">30</option>' + '<option value="40">40</option>' + '<option value="50">50</option>' + '</select>条记录',//左上角的分页大小显示。
+                search: '<span style="color:black">搜索：</span>',//右上角的搜索文本，可以写html标签
+                paginate: {//分页的样式内容。
+                    previous: "上一页",
+                    next: "下一页",
+                    first: "第一页",
+                    last: "最后"
+                },
+                zeroRecords: "没有内容",//table tbody内容为空时，tbody的内容。
+                //下面三者构成了总体的左下角的内容。
+                info: "总共_PAGES_ 页，显示第_START_ 到第 _END_ ，筛选之后得到 _TOTAL_ 条，初始_MAX_ 条 ",//左下角的信息显示，大写的词为关键字。
+                infoEmpty: "0条记录",//筛选为空时左下角的显示。
+                infoFiltered: ""//筛选之后的左下角筛选提示，
+            },
+        });
+        $('#table_local tbody').on('click', 'td.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            }
+            else {
+                // Open this row
+                row.child(format(row.data())).show();
+                tr.addClass('shown');
+            }
+        });
+        $("#table_local_filter input[type=search]").css({ width: "auto" });//右上角的默认搜索文本框，不写这个就超出去了。
+
+    });
+
+    function Del(obj) {
+        var id = parseInt($(obj).parent().attr("id"))
+        alert(id)
+        $.ajax({
+            url: "/api/ViewQuestionAPI/DeleteQuestion/",
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify({ questionid: id }),
+            beforeSend: function () {
+                //$("#submit").val("正在登录中")
+                //$("#submit").attr("disabled", "disabled")
+            },
+            success: function (result) {
+                if (result == true) {
+                    window.location.reload()
+                }
+                else {
+                    alert("删除失败")
+                    return
+                }
+            }
+        })
+        //$(obj).parent().parent().remove()
+    }
+
+    function hello(obj) {
+        //alert($(obj).children("a").eq(0).children("span").attr("class"))
+        if ($(obj).children("a").eq(0).children("span").attr("class") == "glyphicon glyphicon-plus") {
+            $(obj).children("a").eq(0).children("span").attr("class", "glyphicon glyphicon-minus")
+            $(obj).parents("tr").eq(0).next("tr").removeAttr("hidden")
+        }
+        else {
+            $(obj).children("a").eq(0).children("span").attr("class", "glyphicon glyphicon-plus")
+            $(obj).parents("tr").eq(0).next("tr").attr("hidden", "hidden")
+        }
+
+    }
+
+    function getAttarchmentPath(d)
+    {
+        var curWwwPath = window.document.location.href;
+        var pathName = window.document.location.pathname;
+        var pos = curWwwPath.indexOf(pathName);
+        var localhostPaht = curWwwPath.substring(0, pos);
+        var str = localhostPaht + '/Upload' + '/' + d.Course.toString() + '/' + d.Section.toString() + '/' + d.Type.toString() + '/' + d.Difficulty.toString()
+        return str
+    }
+    function verifyurl(url) {
+        var res = ""
+        $.ajax({
+            type: "GET",
+            cache: false,
+            url: url,
+            data: "",
+            error: function (XMLHttpRequest, textStatus) {
+                if(XMLHttpRequest.status == 404)
+                {
+                    console.log(11111111)
+                    res = "not found"
+                }
+                else
+                {
+                    res = "found"
+                }
+            }
+        });
+        console.log(res)
+        return res
+    }
+</script>

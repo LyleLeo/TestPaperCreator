@@ -1,0 +1,101 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>系统管理</h2>
+<br />
+<div class="form-group">
+    <div class="form-inline">
+        <h4>课程：</h4>
+        <select id="Course" class="form-control">
+            <option selected value="0">选择课程</option>
+            @foreach (var i in ViewBag.CourseList)
+            {
+                <option value="@i.id">@i.value</option>
+            }
+        </select>
+        <button class="btn" onclick="edit(this,0)">删除</button>
+        <input placeholder="请输入课程名称" class="form-control" />
+        <button onclick="edit(this,1)" class="btn">添加</button>
+    </div>
+</div>
+<div class="form-group">
+    <div class="form-inline">
+        <h4>题型：</h4>
+        <select id="Type" class="form-control">
+            <option selected value="0">选择题型</option>
+            @foreach (var i in ViewBag.QuestionTypeList)
+            {
+                <option value="@i.id">@i.value</option>
+            }
+        </select>
+        <button class="btn" onclick="edit(this,0)">删除</button>
+        <input placeholder="请输入课程名称" class="form-control" />
+        <button class="btn">添加</button>
+    </div>
+</div>
+<div class="form-group">
+    <div class="form-inline">
+        <h4>章节：</h4>
+        <select id="Section" class="form-control">
+            <option value="0">选择章节</option>
+            @foreach (var i in ViewBag.SectionList)
+            {
+                <option value="@i.id">@i.value</option>
+            }
+        </select>
+        <button class="btn" onclick="edit(this,0)">删除</button>
+        <input placeholder="请输入课程名称" class="form-control" />
+        <button class="btn">添加</button>
+    </div>
+</div>
+<div class="form-group">
+    <div class="form-inline">
+        <h4>难易度：</h4>
+        <select id="Difficulty" class="form-control">
+            <option value="0">选择难易度</option>
+            @foreach (var i in ViewBag.DifficultyList)
+            {
+                <option value="@i.id">@i.value</option>
+            }
+        </select>
+        <button class="btn" onclick="edit(this,0)">删除</button>
+        <input placeholder="请输入课程名称" class="form-control" />
+        <button class="btn">添加</button>
+    </div>
+</div>
+<div class="form-group">
+    <label style="font-size:large">请选择想要删除的项目，请确认被删除项目下没有任何题目</label>
+</div>
+<script type="text/javascript">
+    function edit(obj,flag)
+    {
+        if (flag == 0)
+        {
+            var condition = $(obj).parent().children("select").attr("id")
+            var value = $(obj).parent().children("select").find("option:selected").text()
+        }
+        else
+        {
+            var condition = $(obj).parent().children("select").attr("id")
+            var value = $(obj).parent().children("input").val()
+        }
+        $.ajax({
+            url: "/api/ManageAPI/EditCondition/",
+            type: "POST",
+            contentType: 'application/json',
+            //data: { "": paperlist },
+            data: JSON.stringify({Condition:condition,Value:value,Flag:flag}),
+            beforeSend: function () {
+                //$("#submit").val("正在登录中")
+                //$("#submit").attr("disabled", "disabled")
+            },
+            success: function (result) {
+                window.location.reload()
+            }
+        })
+    }
+    
+</script>

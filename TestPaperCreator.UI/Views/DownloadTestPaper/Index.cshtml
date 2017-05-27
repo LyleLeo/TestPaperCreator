@@ -1,0 +1,245 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    
+</style>
+<h1>下载试题</h1>
+<div class="panel panel-primary">
+    <div class="panel-heading">请填写基本资料</div>
+    <div class="panel-body">
+        <div class="row" style="color:black">
+            <div class="col-lg-2 form-group">
+                学校名称：<input placeholder="例：四川师范大学" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                学院名称：<input placeholder="例：计算机科学学院" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                专业名称：<input placeholder="例：化学、软件工程" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                学年：<input placeholder="例：2014-2015" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                学期：<input placeholder="例：1、2" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                考试类型：<input placeholder="例：期中、期末" class="form-control" type="text" />
+            </div>
+        </div>
+        <div class="row" style="color:black">
+            <div class="col-lg-2 form-group">
+                课程名称：<input placeholder="例：无机化学1" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                分卷：<input placeholder="例：A、B" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                考试时长(分钟)：<input placeholder="例：120、90" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                考查方式：<input placeholder="例：开卷、闭卷" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                适用年级：<input placeholder="例：2013、2014" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                适用班级（顿号隔开）：<input placeholder="例：1、2、3" class="form-control" type="text" />
+            </div>
+        </div>
+        <div><span style="color:black">请添加试卷结构</span></div>
+        <div class="row" style="color:black">
+            <div class="col-md-2 form-group">
+                题型：<select id="questiontype" class="form-control">
+                    <option selected value="0">选择题型</option>
+                    @foreach (var i in ViewBag.QuestionTypeList)
+            {
+                        <option value="@i.id">@i.value</option>
+                    }
+                </select>
+            </div>
+            <div class="col-lg-2 form-group">
+                数量：<input placeholder="请填写数量" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                每题分值：<input placeholder="请填写分值" class="form-control" type="text" />
+            </div>
+            <div class="col-lg-2 form-group">
+                总分：<label></label>
+            </div>
+            <div class="col-lg-1 form-group">
+                &nbsp<button id="AddOn" onclick="Add()" class="btn btn-primary form-control" type="button">添加</button>
+            </div>
+        </div>
+        <div><span style="color:red">注：若要为每道题单独设置分值，则要列举出该题型下所有题的分值，以英文逗号隔开，例如问答题数量为3，则每题分值为20,20,30</span></div>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">生成试卷结构</div>
+    <div style="color:black" class="panel-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>题型</th>
+                    <th>数量</th>
+                    <th>分值</th>
+                    <th>总分</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="Content">
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        <button onclick="Create()" id="create" class="btn btn-sm btn-success">生成</button>
+        <label id="total_count" style="color:black">总数：0</label>
+    </div>
+</div>
+<script type="text/javascript">
+    function Add()
+    {
+        var course = $("#course").find("option:selected").val()
+        var coursename = $("#course").find("option:selected").text()
+        var questiontype = $("#questiontype").find("option:selected").val()
+        var questiontypename = $("#questiontype").find("option:selected").text()
+        var section = $("#section").find("option:selected").val()
+        var sectionname = $("#section").find("option:selected").text()
+        var difficulty = $("#difficulty").find("option:selected").val()
+        var difficultyname = $("#difficulty").find("option:selected").text()
+        var count = $("#count").val()
+        var warningword = ""
+        var flag = true
+        if(course == 0)
+        {
+            $("#course").parent().attr("class", "col-md-2 form-group has-error")
+            warningword += "【课程】"
+            flag = false
+        }
+        else
+        {
+            $("#course").parent().attr("class", "col-md-2 form-group")
+        }
+        if (questiontype == 0) {
+            $("#questiontype").parent().attr("class", "col-md-2 form-group has-error")
+            warningword += "【题型】"
+            flag = false
+        }
+        else
+        {
+            $("#questiontype").parent().attr("class", "col-md-2 form-group")
+        }
+        if (section == 0)
+        {
+            console.log("hello")
+            $("#section").parent().attr("class", "col-md-2 form-group has-error")
+            warningword += "【章节】"
+            flag = false
+        }
+        else
+        {
+            $("#section").parent().attr("class", "col-md-2 form-group")
+        }
+        if (difficulty == 0)
+        {
+            $("#difficulty").parent().attr("class", "col-md-2 form-group has-error")
+            warningword += "【难度】"
+            flag = false
+        }
+        else
+        {
+            $("#difficulty").parent().attr("class", "col-md-2 form-group")
+        }
+        if (count == "" || count == 0)
+        {
+            $("#count").parent().attr("class", "col-md-2 form-group has-error")
+            warningword += "【题量】"
+            flag = false
+        }
+        else
+        {
+            $("#count").parent().attr("class", "col-md-2 form-group")
+        }
+        if (flag == false)
+        {
+            alert(count)
+            $("#warning").html(warningword + "有错误")
+            $("#warning").removeAttr("hidden")
+            return
+        }
+        else
+        {
+            $("#warning").html("")
+            $("#warning").attr("hidden", "hidden")
+        }
+        var html = $("#Content").html();
+        html += '<tr>' +
+                    '<td id=' + course + '>' + coursename + '</td>' +
+                    '<td id=' + questiontype + '>' + questiontypename + '</td>' +
+                    '<td id=' + section + '>' + sectionname + '</td>' +
+                    '<td id=' + difficulty + '>' + difficultyname + '</td>' +
+                    '<td id=' + count + '>' + count + '</td>' +
+                    '<td><button id="Del" onclick="Del(this)" class="btn btn-warning" type="button">删除</button></td>' +
+                '</tr>'
+        $("#Content").html(html)
+        var total_count = $("#total_count").text().split("：")[1]
+        total_count = parseInt(total_count) + parseInt(count)
+        $("#total_count").text("总数：" + total_count)
+    }
+    function Create()
+    {
+        var paperlist = []
+        var obj = $("#Content")
+        obj.children("tr").each(function () {
+            var paper = {}
+            var course = $(this).children("td").eq(0).attr("id");
+            var questiontype = $(this).children("td").eq(1).attr("id");
+            var section = $(this).children("td").eq(2).attr("id");
+            var difficulty = $(this).children("td").eq(3).attr("id");
+            var count = $(this).children("td").eq(4).attr("id")
+            paper = {
+                paperproperty: {
+                    course: course,
+                    questiontype: questiontype,
+                    section: section,
+                    difficulty: difficulty
+                },
+                count: count
+            }
+            paperlist.push(paper)
+        })
+        $.ajax({
+            url: "/api/DownloadTestPaperAPI/GetQuestionID/",
+            type: "POST",
+            //contentType: 'application/json',
+            data: { "": paperlist },
+            //data: JSON.stringify(paperlist),
+            beforeSend: function () {
+                $("#create").text("正在生成")
+                //$("#submit").val("正在登录中")
+                //$("#submit").attr("disabled", "disabled")
+            },
+            success: function (result) {
+                alert("生成成功")
+                $("#create").text("生成")
+
+
+                var curWwwPath = window.document.location.href;    //获取当前url
+                var pathName = window.document.location.pathname;
+                var pos = curWwwPath.indexOf(pathName);
+                var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
+
+
+                console.log(localhostPath + "/Upload/Output/out.docx")
+                window.open(localhostPath + "/Upload/Output/out.docx")
+            }
+        })
+    }
+    function Del(obj)
+    {
+        $(obj).parent().parent().remove()
+    }
+</script>

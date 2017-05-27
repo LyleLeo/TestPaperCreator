@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta property="wb:webmaster" content="b32d00391f17bfea" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" media="screen" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/datatables/css/dataTables.bootstrap.css" rel="stylesheet" />
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @*@RenderSection("scripts", required: false)*@
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="~/Content/datatables/js/jquery.dataTables.js"></script>
+    <script src="~/Content/datatables/js/dataTables.bootstrap.js"></script>
+    <style type="text/css">
+        footer {
+            color: white;
+        }
+        .container {
+            color: white;
+        }
+    </style>
+</head>
+<body style="background-image:url(/images/banner.png)">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="/Home/Index" class="navbar-brand">试卷生成器</a>
+
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("主页", "Index", "Home", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("上传试卷", "Index", "UploadQuestions", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("下载试卷", "Index", "DownloadTestPaper", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("管理试题", "Index", "ViewQuestion", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("系统管理", "Index", "Manage", new { area = "" }, null)</li>
+                </ul>
+                <ul class="nav navbar-nav" style="float:right">
+                    @if (ViewBag.IsLogin == true)
+                    {
+                        <li>
+                            <a class="pull-right" href="#">您好，@ViewBag.Username</a>
+
+                        </li>
+                        <li>
+                            <a class="pull-right" href="@Url.Action("Index", "Home")"><span class="glyphicon glyphicon-home"></span></a>
+                        </li>
+                        <li>
+                            <a class="pull-right" href="@Url.Action("Index", "Home")"><span class="glyphicon glyphicon-cog"></span></a>
+                        </li>
+                        <li>
+                            @Html.ActionLink("退出", "Logout", "Membership", new { area = "" }, new { @class = "pull-right" })
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            @Html.ActionLink("注册", "regist", "Membership", new { area = "" }, new { style = "color:red", @class = "pull-right" })
+                        </li>
+                        <li>
+                            @Html.ActionLink("登录", "login", "Membership", new { area = "" }, new { @class = "pull-right" })
+                        </li>
+                    }
+                </ul>
+
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - 试卷生成器 <a style="color:white" href="http://www.miitbeian.gov.cn/">蜀ICP备15026501号-1</a></p>
+        </footer>
+    </div>
+
+
+</body>
+</html>
