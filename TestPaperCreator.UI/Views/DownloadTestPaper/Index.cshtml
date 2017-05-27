@@ -121,7 +121,6 @@
         }
         if (questioncount == ""||questioncount == 0)
         {
-            console.log("hello")
             $("#questioncount").parent().attr("class", "col-md-2 form-group has-error")
             warningword += "【题量】"
             flag = false
@@ -166,9 +165,23 @@
         $.each(score.split(','), function (i, val) {
             totalscorebycaculate+=parseInt(val)
         })
+        if (score.split(',').length == 1)
+        {
+            totalscorebycaculate = parseInt(score)*parseInt(questioncount)
+        }
         if (totalscorebycaculate != totalscore)
         {
             $("#warning").html("【数量】【每题分值】【总分】 不匹配")
+            $("#warning").removeAttr("hidden")
+            return
+        }
+        else {
+            $("#warning").html("")
+            $("#warning").attr("hidden", "hidden")
+        }
+        if (score.split(',').length != 1 && score.split(',').length != parseInt(questioncount))
+        {
+            $("#warning").html("【数量】【每题分值】 不匹配")
             $("#warning").removeAttr("hidden")
             return
         }
@@ -185,7 +198,6 @@
                     '<td><button id="Del" onclick="Del(this)" class="btn btn-warning" type="button">删除</button></td>' +
                 '</tr>'
         $("#Content").html(html)
-        alert(questioncount)
         var total_count = $("#total_count").text().split("：")[1]
         var total_score = $("#total_score").text().split("：")[1]
         total_count = parseInt(total_count) + parseInt(questioncount)
