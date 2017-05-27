@@ -12,42 +12,42 @@
     <div class="panel-body">
         <div class="row" style="color:black">
             <div class="col-lg-2 form-group">
-                学校名称：<input placeholder="例：四川师范大学" class="form-control" type="text" />
+                学校名称：<input id="schoolname" placeholder="例：四川师范大学" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                学院名称：<input placeholder="例：计算机科学学院" class="form-control" type="text" />
+                学院名称：<input id="collegename" placeholder="例：计算机科学学院" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                专业名称：<input placeholder="例：化学、软件工程" class="form-control" type="text" />
+                专业名称：<input id="majorname" placeholder="例：化学、软件工程" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                学年：<input placeholder="例：2014-2015" class="form-control" type="text" />
+                学年：<input id="schoolyear" placeholder="例：2014-2015" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                学期：<input placeholder="例：1、2" class="form-control" type="text" />
+                学期：<input id="term" placeholder="例：1、2" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                考试类型：<input placeholder="例：期中、期末" class="form-control" type="text" />
+                考试类型：<input id="testtype" placeholder="例：期中、期末" class="form-control" type="text" />
             </div>
         </div>
         <div class="row" style="color:black">
             <div class="col-lg-2 form-group">
-                课程名称：<input placeholder="例：无机化学1" class="form-control" type="text" />
+                课程名称：<input id="coursename" placeholder="例：无机化学1" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                分卷：<input placeholder="例：A、B" class="form-control" type="text" />
+                分卷：<input id="volume" placeholder="例：A、B" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                考试时长(分钟)：<input placeholder="例：120、90" class="form-control" type="text" />
+                考试时长(分钟)：<input id="length" placeholder="例：120、90" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                考查方式：<input placeholder="例：开卷、闭卷" class="form-control" type="text" />
+                考查方式：<input id="testmethod" placeholder="例：开卷、闭卷" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                适用年级：<input placeholder="例：2013、2014" class="form-control" type="text" />
+                适用年级：<input id="grade" placeholder="例：2013、2014" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                适用班级（顿号隔开）：<input placeholder="例：1、2、3" class="form-control" type="text" />
+                适用班级（顿号隔开）：<input id="class" placeholder="例：1、2、3" class="form-control" type="text" />
             </div>
         </div>
         <div><span style="color:black">请添加试卷结构</span></div>
@@ -62,18 +62,19 @@
                 </select>
             </div>
             <div class="col-lg-2 form-group">
-                数量：<input placeholder="请填写数量" class="form-control" type="text" />
+                数量：<input id="questioncount" placeholder="请填写数量" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                每题分值：<input placeholder="请填写分值" class="form-control" type="text" />
+                每题分值：<input id="score" placeholder="请填写分值" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                总分：<label></label>
+                总分：<input id="totalscore" placeholder="请填写分值" class="form-control" type="text" />
             </div>
             <div class="col-lg-1 form-group">
                 &nbsp<button id="AddOn" onclick="Add()" class="btn btn-primary form-control" type="button">添加</button>
             </div>
         </div>
+        <div id="warning" class="alert alert-warning" hidden="hidden"></div>
         <div><span style="color:red">注：若要为每道题单独设置分值，则要列举出该题型下所有题的分值，以英文逗号隔开，例如问答题数量为3，则每题分值为20,20,30</span></div>
     </div>
 </div>
@@ -96,33 +97,19 @@
     </div>
     <div class="panel-footer">
         <button onclick="Create()" id="create" class="btn btn-sm btn-success">生成</button>
-        <label id="total_count" style="color:black">总数：0</label>
+        <label id="total_count" style="color:black">总数：0</label>&nbsp&nbsp&nbsp<label style="color:black" id="total_score">总分：0</label>
     </div>
 </div>
 <script type="text/javascript">
     function Add()
     {
-        var course = $("#course").find("option:selected").val()
-        var coursename = $("#course").find("option:selected").text()
         var questiontype = $("#questiontype").find("option:selected").val()
         var questiontypename = $("#questiontype").find("option:selected").text()
-        var section = $("#section").find("option:selected").val()
-        var sectionname = $("#section").find("option:selected").text()
-        var difficulty = $("#difficulty").find("option:selected").val()
-        var difficultyname = $("#difficulty").find("option:selected").text()
-        var count = $("#count").val()
+        var questioncount = $("#questioncount").val()
+        var score = $("#score").val()
+        var totalscore = $("#totalscore").val()        
         var warningword = ""
         var flag = true
-        if(course == 0)
-        {
-            $("#course").parent().attr("class", "col-md-2 form-group has-error")
-            warningword += "【课程】"
-            flag = false
-        }
-        else
-        {
-            $("#course").parent().attr("class", "col-md-2 form-group")
-        }
         if (questiontype == 0) {
             $("#questiontype").parent().attr("class", "col-md-2 form-group has-error")
             warningword += "【题型】"
@@ -132,40 +119,40 @@
         {
             $("#questiontype").parent().attr("class", "col-md-2 form-group")
         }
-        if (section == 0)
+        if (questioncount == ""||questioncount == 0)
         {
             console.log("hello")
-            $("#section").parent().attr("class", "col-md-2 form-group has-error")
-            warningword += "【章节】"
-            flag = false
-        }
-        else
-        {
-            $("#section").parent().attr("class", "col-md-2 form-group")
-        }
-        if (difficulty == 0)
-        {
-            $("#difficulty").parent().attr("class", "col-md-2 form-group has-error")
-            warningword += "【难度】"
-            flag = false
-        }
-        else
-        {
-            $("#difficulty").parent().attr("class", "col-md-2 form-group")
-        }
-        if (count == "" || count == 0)
-        {
-            $("#count").parent().attr("class", "col-md-2 form-group has-error")
+            $("#questioncount").parent().attr("class", "col-md-2 form-group has-error")
             warningword += "【题量】"
             flag = false
         }
         else
         {
-            $("#count").parent().attr("class", "col-md-2 form-group")
+            $("#questioncount").parent().attr("class", "col-md-2 form-group")
+        }
+        if (score == ""||score == 0)
+        {
+            $("#score").parent().attr("class", "col-md-2 form-group has-error")
+            warningword += "【分值】"
+            flag = false
+        }
+        else
+        {
+            $("#score").parent().attr("class", "col-md-2 form-group")
+        }
+        if (totalscore == "" || totalscore == 0)
+        {
+            $("#totalscore").parent().attr("class", "col-md-2 form-group has-error")
+            warningword += "【总分】"
+            flag = false
+        }
+        else
+        {
+            $("#totalscore").parent().attr("class", "col-md-2 form-group")
         }
         if (flag == false)
         {
-            alert(count)
+            
             $("#warning").html(warningword + "有错误")
             $("#warning").removeAttr("hidden")
             return
@@ -175,19 +162,36 @@
             $("#warning").html("")
             $("#warning").attr("hidden", "hidden")
         }
+        var totalscorebycaculate = 0
+        $.each(score.split(','), function (i, val) {
+            totalscorebycaculate+=parseInt(val)
+        })
+        if (totalscorebycaculate != totalscore)
+        {
+            $("#warning").html("【数量】【每题分值】【总分】 不匹配")
+            $("#warning").removeAttr("hidden")
+            return
+        }
+        else {
+            $("#warning").html("")
+            $("#warning").attr("hidden", "hidden")
+        }
         var html = $("#Content").html();
         html += '<tr>' +
-                    '<td id=' + course + '>' + coursename + '</td>' +
                     '<td id=' + questiontype + '>' + questiontypename + '</td>' +
-                    '<td id=' + section + '>' + sectionname + '</td>' +
-                    '<td id=' + difficulty + '>' + difficultyname + '</td>' +
-                    '<td id=' + count + '>' + count + '</td>' +
+                    '<td id=' + questiontype + '_' + questioncount + '>' + questioncount + '</td>' +
+                    '<td id=' + questiontype + '_' + score + '>' + score + '</td>' +
+                    '<td id=' + questiontype + '_' + totalscore + '>' + totalscore + '</td>' +
                     '<td><button id="Del" onclick="Del(this)" class="btn btn-warning" type="button">删除</button></td>' +
                 '</tr>'
         $("#Content").html(html)
+        alert(questioncount)
         var total_count = $("#total_count").text().split("：")[1]
-        total_count = parseInt(total_count) + parseInt(count)
+        var total_score = $("#total_score").text().split("：")[1]
+        total_count = parseInt(total_count) + parseInt(questioncount)
+        total_score = parseInt(total_score)+parseInt(totalscore)
         $("#total_count").text("总数：" + total_count)
+        $("#total_score").text("总分：" + total_score)
     }
     function Create()
     {
