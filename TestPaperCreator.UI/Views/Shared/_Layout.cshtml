@@ -8,13 +8,10 @@
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" media="screen" />
     <title>@ViewBag.Title</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Content/datatables/css/dataTables.bootstrap.css" rel="stylesheet" />
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @*@RenderSection("scripts", required: false)*@
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="~/Scripts/jquery-1.12.4.js"></script>
     <script src="~/Content/datatables/js/jquery.dataTables.js"></script>
     <script src="~/Content/datatables/js/dataTables.bootstrap.js"></script>
     <style type="text/css">
