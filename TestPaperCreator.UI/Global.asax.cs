@@ -19,5 +19,10 @@ namespace TestPaperCreator.UI
             GlobalConfiguration.Configure(WebApiConfig.Register);
             RouteConfig.RegisterRoutes(RouteTable.Routes);            
         }
+        public override void Init()
+        {
+            this.PostAuthenticateRequest += (sender, e) => HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.Required);
+            base.Init();
+        }
     }
 }

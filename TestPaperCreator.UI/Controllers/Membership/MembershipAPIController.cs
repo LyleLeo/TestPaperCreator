@@ -28,7 +28,8 @@ namespace TestPaperCreator.Controllers.Membership
             {
                 var rememberme = user.rememberme;
                 HttpSessionState session = HttpContext.Current.Session;
-                session["user"] = TestPaperCreator.BLL.Utility.Utility.Serialize<User>(user);
+                session.Add("user", BLL.Utility.Utility.Serialize<User>(user));
+                //session["user"] = TestPaperCreator.BLL.Utility.Utility.Serialize<User>(user);
                 if (user.rememberme == 1)
                 {
                     HttpCookie cookie = new HttpCookie("UserInfo");

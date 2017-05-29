@@ -102,11 +102,11 @@ namespace TestPaperCreator.DAL.TestPaperService
         public static List<MODEL.TestPaper.Condition> GetQuestionType()
         {
             List<MODEL.TestPaper.Condition> typelist = new List<MODEL.TestPaper.Condition>();
-            MODEL.TestPaper.Condition type = new MODEL.TestPaper.Condition();
             string sql = "select ID, Value from Type where Flag = 1";
             DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
+                MODEL.TestPaper.Condition type = new MODEL.TestPaper.Condition();
                 type.id = (int)dr[0];
                 type.value = (string)dr[1];
                 typelist.Add(type);
@@ -211,7 +211,7 @@ namespace TestPaperCreator.DAL.TestPaperService
         /// <returns>试题列表</returns>
         public static List<MODEL.TestPaper.Question> GetQuestionList(int course, int section, int difficulty, int questiontype, string keyword)
         {
-            string sql = "select questions.ID,questions.Type, questiontype.Value ,questions.Course, course.Value,questions.Section, section.Value,questions.Difficulty, difficulty.Value, questions.Content from Questions questions, Difficulty difficulty, Course course, Section section, Type questiontype where questions.Flag = 1 and course.Flag = 1";
+            string sql = "SELECT questions.ID, questions.Type, questiontype.Value, questions.Course, course.Value, questions.Section, section.Value, questions.Difficulty, difficulty.Value, questions.Content FROM Questions questions, Difficulty difficulty, Course course, Section section, Type questiontype WHERE questions.Flag = 1 AND course.Flag = 1 AND questiontype.Flag = 1 AND[Section].[Flag] = 1 AND[Difficulty].[Flag] = 1 AND[Questions].[Type] = questiontype.[ID] AND[Questions].[Course] = [Course].[ID] AND[Questions].[Section] = [Section].[ID] AND[Questions].[Difficulty] = [Difficulty].[ID]";
             if (course != 0)
             {
                 sql += "and Course = " + course;

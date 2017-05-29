@@ -3,11 +3,23 @@
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<style type="text/css">
+<select style="display:none" id="section_detail" class="form-control">
+    <option selected value="0">选择章节</option>
+    @foreach (var i in ViewBag.SectionList)
+    {
+        <option id="@i.id">@i.value</option>
+    }
+</select>
+<select style="display:none" id="difficulty_detail" class="form-control">
+    <option selected value="0">选择难度</option>
+    @foreach(var i in ViewBag.DifficultyList)
+    {
+        <option id="@i.id">@i.value</option>
+    }
+</select>
 
-</style>
 <h1>下载试题</h1>
-<div class="panel panel-primary">
+<div id="basic_form" class="panel panel-primary" style="color:black">
     <div class="panel-heading">请填写基本资料</div>
     <div class="panel-body">
         <div class="row" style="color:black">
@@ -32,7 +44,14 @@
         </div>
         <div class="row" style="color:black">
             <div class="col-lg-2 form-group">
-                课程名称：<input id="coursename" placeholder="例：无机化学1" class="form-control" type="text" />
+                课程名称：<select id="course" class="form-control">
+                    <option selected value="0">选择课程</option>
+                    @foreach (var i in ViewBag.CourseList)
+            {
+                        <option value="@i.id">@i.value</option>
+                    }
+                </select>
+
             </div>
             <div class="col-lg-2 form-group">
                 分卷：<input id="volume" placeholder="例：A、B" class="form-control" type="text" />
@@ -76,17 +95,12 @@
         </div>
         <div id="warning" class="alert alert-warning" hidden="hidden"></div>
         <div><span style="color:red">注：若要为每道题单独设置分值，则要列举出该题型下所有题的分值，以英文逗号隔开，例如问答题数量为3，则每题分值为20,20,30</span></div>
-    </div>
-</div>
-<div class="panel panel-primary">
-    <div class="panel-heading">生成试卷结构</div>
-    <div style="color:black" class="panel-body">
-        <table class="table">
+        <table id="basic_table" class="table">
             <thead>
                 <tr>
                     <th>题型</th>
                     <th>数量</th>
-                    <th>分值</th>
+                    <th>每题分值</th>
                     <th>总分</th>
                     <th>操作</th>
                 </tr>
@@ -95,11 +109,169 @@
         </table>
     </div>
     <div class="panel-footer">
-        <button onclick="Create()" id="create" class="btn btn-sm btn-success">生成</button>
         <label id="total_count" style="color:black">总数：0</label>&nbsp&nbsp&nbsp<label style="color:black" id="total_score">总分：0</label>
+        <button onclick="Create_Details()" id="create" class="btn btn-sm btn-success pull-right">详细设置</button>
     </div>
 </div>
+
+@*<div id="1" class="panel panel-primary">
+        <!--问题类型ID-->
+        <div class="panel-heading">请填写选择题详情</div>
+        <div style="color:black" class="panel-body">
+            <div><span style="color:black">请添加试卷结构</span></div>
+            <div class="row" style="color:black">
+                <div class="col-lg-2 form-group">
+                    课程名称：<select class="form-control" disabled="disabled">
+                        <option value="1">无机化学</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 form-group">
+                    题型：<select class="form-control" disabled="disabled">
+                        <option value="1">选择题</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 form-group">
+                    章节：<select id="questiontype" class="form-control">
+                        <option selected value="0">选择章节</option>
+                        @foreach (var i in ViewBag.SectionList)
+                        {
+                            <option value="@i.id">@i.value</option>
+                        }
+                    </select>
+
+                </div>
+                <div class="col-lg-2 form-group">
+                    难度：<select id="questiontype" class="form-control">
+                        <option selected value="0">选择难度</option>
+                        @foreach (var i in ViewBag.DifficultyList)
+                        {
+                            <option value="@i.id">@i.value</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-2 form-group">
+                    数量：<input id="totalscore" placeholder="请填写数量" class="form-control" type="text" />
+                </div>
+                <div class="col-lg-1 form-group">
+                    &nbsp<button id="AddOn" onclick="Add_Details(this)" class="btn btn-primary form-control" type="button">添加</button>
+                </div>
+            </div>
+            <div id="detail_warning" class="alert alert-warning" hidden="hidden"></div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>课程名称</th>
+                        <th>题型</th>
+                        <th>章节</th>
+                        <th>难度</th>
+                        <th>数量</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="Detail_Content"></tbody>
+            </table>
+        </div>
+        <div class="panel-footer">
+            <button onclick="Create()" id="prestep_0" class="btn btn-sm btn-success">上一步</button>
+            <button onclick="Create()" id="nextstep_2" class="btn btn-sm btn-success pull-right">下一步</button>
+        </div>
+    </div>*@
 <script type="text/javascript">
+    function Next_Step(obj)
+    {
+        var next_id = $(obj).attr("id").split("_")[1]
+        $(obj).parent().parent().hide()
+        $(obj).parent().parent().next().show()
+    }
+    function Pre_Step(obj)
+    {
+        var pre_id = $(obj).attr("id").split("_")[1]
+        $(obj).parent().parent().hide()
+        $(obj).parent().parent().prev().show()
+    }
+    function Create_Details() {
+        $("#basic_form").hide()
+        $.each($(".container").children("div"), function (index, obj) {
+            if($(obj).attr("type") == "step")
+            {
+                $(obj).remove()
+            }
+        })
+        var html = ""
+        $.each($("#Content").children("tr"), function (index, obj) {
+            var typeid = $(obj).children("td").eq(0).attr("id")
+            var typename = $(obj).children("td").eq(0).text()
+            var courseid = $("#course").find("option:selected").val()
+            var coursename = $("#course").find("option:selected").text()
+            console.log(typename)
+            html += Create_Details_Form(typeid, typename, courseid, coursename)
+        })
+        $("#basic_form").after(html)
+        $.each($(".container").children("div"), function (index, obj) {
+            if ($(obj).attr("type") == "step") {
+                console.log()
+                $(obj).find("select").removeAttr("style")
+                $(obj).children("select").eq(2).removeAttr("style")
+            }
+        })
+        var firstid = $("#Content").children("tr").eq(0).children("td").eq(0).attr("id")
+        $("#detail_" + firstid).show()
+    }
+    function Create_Details_Form(questiontypeid, questiontypename, courseid, coursename) {
+        var sectionselect = document.getElementById("section_detail").outerHTML
+        var difficultyselect = document.getElementById("difficulty_detail").outerHTML
+        var prestep = parseInt(questiontypeid) - 1
+        var nextstep = parseInt(questiontypeid) + 1
+        var html = '<div hidden="hidden" type="step" id="detail_' + questiontypeid + '" class="panel panel-primary">' +
+    '<div class="panel-heading">' + questiontypename + '详情</div>' +
+    '<div style="color:black" class="panel-body">' +
+        '<div><span style="color:black">请添加试卷结构</span></div>' +
+        '<div class="row" style="color:black">' +
+            '<div class="col-lg-2 form-group">' +
+                '课程名称：<select class="form-control" disabled="disabled">' +
+                    '<option value="' + courseid + '">' + coursename + '</option>' +
+                '</select>' +
+            '</div>' +
+            '<div class="col-lg-2 form-group">' +
+                '题型：<select class="form-control" disabled="disabled">' +
+                    '<option value="' + questiontypeid + '">' + questiontypename + '</option>' +
+                '</select>' +
+            '</div>' +
+            '<div class="col-lg-2 form-group">' +
+               '章节：' + sectionselect +
+'</div>' +
+'<div class="col-lg-2 form-group">' +
+    '难度：' + difficultyselect +
+'</div>' +
+'<div class="col-lg-2 form-group">' +
+    '数量：<input id="totalscore" placeholder="请填写数量" class="form-control" type="text" />' +
+'</div>' +
+'<div class="col-lg-1 form-group">' +
+    '&nbsp<button id="AddOn" onclick="Add_Details(this)" class="btn btn-primary form-control" type="button">添加</button>' +
+'</div>' +
+'</div>' +
+'<div id="detail_warning" class="alert alert-warning" hidden="hidden"></div>' +
+'<table class="table">' +
+'<thead>' +
+    '<tr>' +
+        '<th>课程名称</th>' +
+        '<th>题型</th>' +
+        '<th>章节</th>' +
+        '<th>难度</th>' +
+        '<th>数量</th>' +
+        '<th>操作</th>' +
+    '</tr>' +
+'</thead>' +
+'<tbody id="Detail_Content_' + questiontypeid + '"></tbody>' +
+'</table>' +
+'</div>' +
+'<div class="panel-footer">' +
+'<button onclick="Pre_Step(this)" id="prestep_' + prestep + '" class="btn btn-sm btn-success">上一步</button>' +
+'<button onclick="Next_Step(this)" id="nextstep_' + nextstep + '" class="btn btn-sm btn-success pull-right">下一步</button>' +
+'</div>' +
+'</div>'
+        return html
+    }
     function Add() {
         var questiontype = $("#questiontype").find("option:selected").val()
         var questiontypename = $("#questiontype").find("option:selected").text()
@@ -191,6 +363,64 @@
         $("#total_count").text("总数：" + total_count)
         $("#total_score").text("总分：" + total_score)
     }
+    function Add_Details(obj, questiontype) {
+        var course = $(obj).parent().parent().children("div").eq(0).find("option:selected").val()
+        var coursename = $(obj).parent().parent().children("div").eq(0).find("option:selected").text()
+        var questiontype = $(obj).parent().parent().children("div").eq(1).find("option:selected").val()
+        var questiontypename = $(obj).parent().parent().children("div").eq(1).find("option:selected").text()
+        var section = $(obj).parent().parent().children("div").eq(2).find("option:selected").val()
+        var sectionname = $(obj).parent().parent().children("div").eq(2).find("option:selected").text()
+        var difficulty = $(obj).parent().parent().children("div").eq(3).find("option:selected").val()
+        var difficultyname = $(obj).parent().parent().children("div").eq(3).find("option:selected").text()
+        var count_type = $(obj).parent().parent().children("div").eq(4).children("input").eq(0).val()
+        var warningword = ""
+        var flag = true
+        if (section == 0) {
+            console.log(111)
+            $(obj).parent().parent().children("div").eq(0).attr("class", "col-md-2 form-group has-error")
+            warningword += "【章节】"
+            flag = false
+        }
+        else {
+            $(obj).parent().parent().children("div").eq(0).attr("class", "col-md-2 form-group")
+        }
+        if (difficulty == 0) {
+            $(obj).parent().parent().children("div").eq(1).attr("class", "col-md-2 form-group has-error")
+            warningword += "【难度】"
+            flag = false
+        }
+        else {
+            $(obj).parent().parent().children("div").eq(1).attr("class", "col-md-2 form-group")
+        }
+        if (count_type == 0 || count_type == "") {
+            warningword += "【题量】"
+            flag = false
+            $(obj).parent().parent().children("div").eq(2).attr("class", "col-md-2 form-group has-error")
+        }
+        else {
+            $(obj).parent().parent().children("div").eq(2).attr("class", "col-md-2 form-group")
+        }
+        if (flag == false) {
+            $("#detail_warning").html(warningword + "有错误")
+            $("#detail_warning").removeAttr("hidden")
+            return
+        }
+        else {
+            $("#detail_warning").html("")
+            $("#detail_warning").attr("hidden", "hidden")
+        }
+        console.log(111)
+        var html = $("#Detail_Content_" + questiontype).html();
+        html += '<tr>' +
+                    '<td id=' + course + '>' + coursename + '</td>' +
+                    '<td id=' + questiontype + '>' + questiontypename + '</td>' +
+                    '<td id=' + section + '>' + sectionname + '</td>' +
+                    '<td id=' + difficulty + '>' + difficultyname + '</td>' +
+                    '<td id=' + count_type + '>' + count_type + '</td>' +
+                    '<td><button id="Del_Detail" onclick="Del_Detail(this)" class="btn btn-warning" type="button">删除</button></td>' +
+                '</tr>'
+        $("#Detail_Content_" + questiontype).html(html)
+    }
     function Create() {
         var paperlist = []
         var obj = $("#Content")
@@ -238,6 +468,15 @@
         })
     }
     function Del(obj) {
+        $(obj).parent().parent().remove()
+        var oldcount = $("#total_count").text().split("：")[1]
+        var newcount = parseInt(oldcount) - parseInt($(obj).parent().parent().children("td").eq(1).text())
+        $("#total_count").text("总数：" + newcount)
+        var oldscore = $("#total_score").text().split("：")[1]
+        var newscore = parseInt(oldscore) - parseInt($(obj).parent().parent().children("td").eq(3).text())
+        $("#total_score").text("总分：" + newscore)
+    }
+    function Del_Detail(obj) {
         $(obj).parent().parent().remove()
     }
 </script>
