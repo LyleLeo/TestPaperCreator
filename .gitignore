@@ -240,3 +240,4 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/TestPaperCreator.UI/Upload/1/1/1/1

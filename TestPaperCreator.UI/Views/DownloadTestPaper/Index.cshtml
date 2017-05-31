@@ -6,20 +6,37 @@
     <option selected value="0">选择章节</option>
     @foreach (var i in ViewBag.SectionList)
     {
-        <option id="@i.id">@i.value</option>
+        <option value="@i.id">@i.value</option>
     }
 </select>
 <select style="display:none" id="difficulty_detail" class="form-control">
     <option selected value="0">选择难度</option>
     @foreach (var i in ViewBag.DifficultyList)
     {
-        <option id="@i.id">@i.value</option>
+        <option value="@i.id">@i.value</option>
     }
 </select>
 
 <h1>下载试题</h1>
+<div class="panel panel-primary" style="color:black;display:none" id="testpaper">
+    <div class="panel-heading">试卷预览</div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table id="testpapertable" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th colspan="4" width="90%">题干</th>
+                        <th colspan="1" width="10%">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 <div id="final" class="panel panel-primary" style="color:black;display:none">
-    <div class="panel-heading">最终预览</div>
+    <div class="panel-heading">配置预览</div>
     <div class="panel-body">
         <div class="row" style="color:black">
             <div class="col-lg-2 form-group">
@@ -71,7 +88,7 @@
     </div>
     <div class="panel-footer">
         <button onclick="Back(this)" id="back" class="btn btn-sm btn-success">上一步</button>
-        <button onclick="Next_Step(this)" id="nextstep" class="btn btn-sm btn-success pull-right">下一步</button>
+        <button onclick="Create()" id="nextstep" class="btn btn-sm btn-success pull-right">下一步</button>
     </div>
 </div>
 <div id="basic_form" class="panel panel-primary" style="color:black">
@@ -136,13 +153,13 @@
                 </select>
             </div>
             <div class="col-lg-2 form-group">
-                数量：<input id="questioncount" placeholder="请填写数量" class="form-control" type="text" />
+                数量：<input id="questioncount" onfocus="this.select()" placeholder="请填写数量" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                每题分值：<input id="score" placeholder="请填写分值" class="form-control" type="text" />
+                每题分值：<input id="score" onfocus="this.select()" placeholder="请填写分值" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                总分：<input id="totalscore" placeholder="请填写分值" class="form-control" type="text" />
+                总分：<input id="totalscore" onfocus="this.select()" placeholder="请填写分值" class="form-control" type="text" />
             </div>
             <div class="col-lg-1 form-group">
                 &nbsp<button id="AddOn" onclick="Add()" class="btn btn-primary form-control" type="button">添加</button>
@@ -184,7 +201,10 @@
             //$("[type='step']").show()
             $.each($("#final").children("div").eq(1).children("table"), function (index,table) {
                 $.each($(table).children("tbody").children("tr"), function (s_index, tr) {
-                    $(tr).children("td").last().remove()
+                    if ($(tr).children("td").last().children("button").eq(0).attr("id") == "Del_Detail")
+                    {
+                        $(tr).children("td").last().remove()
+                    }
                 })
             })
             $("#final").show()
@@ -226,6 +246,7 @@
         $("#final").children("div").eq(1).children("table").last().remove()
     }
     function Create_Details() {
+        $("#final").children("div").eq(1).children("table").remove()
         var basiclist = ["schoolname", "collegename", "majorname", "schoolyear", "term", "testtype", "course", "volume", "length", "testmethod", "grade", "class"]
         $("#basic_form").hide()
         //var basic_html = ""
@@ -233,7 +254,6 @@
         //$("#final").children("div").eq(1).html(basic_html)
         var i = 0
         for (i; i < basiclist.length; i++) {
-            console.log($("#" + basiclist[i]).val())
             $("#final_" + basiclist[i]).val($("#" + basiclist[i]).val())
         }
         //若之前有内容，先移除
@@ -249,8 +269,10 @@
             var typename = $(obj).children("td").eq(0).text()
             var courseid = $("#course").find("option:selected").val()
             var coursename = $("#course").find("option:selected").text()
+            var questioncount = $(obj).children("td").eq(1).text()
+            var questionscore = $(obj).children("td").eq(2).text()
             console.log(typename)
-            html += Create_Details_Form(typeid, typename, courseid, coursename)
+            html += Create_Details_Form(typeid, typename, courseid, coursename,questioncount,questionscore)
         })
         $("#basic_form").after(html)
         $.each($(".container").children("div"), function (index, obj) {
@@ -263,7 +285,7 @@
         var firstid = $("#Content").children("tr").eq(0).children("td").eq(0).attr("id")
         $("#detail_" + firstid).show()
     }
-    function Create_Details_Form(questiontypeid, questiontypename, courseid, coursename) {
+    function Create_Details_Form(questiontypeid, questiontypename, courseid, coursename,questioncount,questionscore) {
         var sectionselect = document.getElementById("section_detail").outerHTML
         var difficultyselect = document.getElementById("difficulty_detail").outerHTML
         var prestep = parseInt(questiontypeid) - 1
@@ -271,7 +293,7 @@
         var html = '<div hidden="hidden" type="step" id="detail_' + questiontypeid + '" class="panel panel-primary">' +
     '<div class="panel-heading">' + questiontypename + '详情</div>' +
     '<div style="color:black" class="panel-body">' +
-        '<div><h2 style="color:black">请添加' + questiontypename + '</h2></div>' +
+        '<div><h2><span style="color:black">请添加</span><span style="color:red">' + questiontypename + '</span><span>(共' + questioncount + '题，每题' + questionscore + '分)</span></h2></div>' +
         '<div class="row" style="color:black">' +
             '<div class="col-lg-2 form-group">' +
                 '课程名称：<select class="form-control" disabled="disabled">' +
@@ -290,10 +312,10 @@
     '难度：' + difficultyselect +
 '</div>' +
 '<div class="col-lg-2 form-group">' +
-    '数量：<input id="totalscore" placeholder="请填写数量" class="form-control" type="text" />' +
+    '数量：<input id="totalscore" onfocus="this.select()" placeholder="请填写数量" class="form-control" type="text" />' +
 '</div>' +
 '<div class="col-lg-1 form-group">' +
-    '&nbsp<button id="AddOn" onclick="Add_Details(this)" class="btn btn-primary form-control" type="button">添加</button>' +
+    '&nbsp<button id="AddOn" onclick="Add_Details(this,'+questioncount+')" class="btn btn-primary form-control" type="button">添加</button>' +
 '</div>' +
 '</div>' +
 '<div id="detail_warning" class="alert alert-warning" hidden="hidden"></div>' +
@@ -313,7 +335,7 @@
 '</div>' +
 '<div class="panel-footer">' +
 '<button onclick="Pre_Step(this)" id="prestep_' + prestep + '" class="btn btn-sm btn-success">上一步</button>' +
-'<button onclick="Next_Step(this)" id="nextstep_' + nextstep + '" class="btn btn-sm btn-success pull-right">下一步</button>' +
+'<button onclick="Next_Step(this)" id="nextstep_' + nextstep + '" class="btn btn-sm btn-success pull-right" disabled="disabled">下一步</button>' +
 '</div>' +
 '</div>'
         return html
@@ -419,7 +441,7 @@
         $("#total_count").text("总数：" + total_count)
         $("#total_score").text("总分：" + total_score)
     }
-    function Add_Details(obj, questiontype) {
+    function Add_Details(obj, questioncount) {
         var course = $(obj).parent().parent().children("div").eq(0).find("option:selected").val()
         var coursename = $(obj).parent().parent().children("div").eq(0).find("option:selected").text()
         var questiontype = $(obj).parent().parent().children("div").eq(1).find("option:selected").val()
@@ -432,29 +454,28 @@
         var warningword = ""
         var flag = true
         if (section == 0) {
-            console.log(111)
-            $(obj).parent().parent().children("div").eq(0).attr("class", "col-md-2 form-group has-error")
+            $(obj).parent().parent().children("div").eq(2).attr("class", "col-md-2 form-group has-error")
             warningword += "【章节】"
             flag = false
         }
         else {
-            $(obj).parent().parent().children("div").eq(0).attr("class", "col-md-2 form-group")
+            $(obj).parent().parent().children("div").eq(2).attr("class", "col-md-2 form-group")
         }
         if (difficulty == 0) {
-            $(obj).parent().parent().children("div").eq(1).attr("class", "col-md-2 form-group has-error")
+            $(obj).parent().parent().children("div").eq(3).attr("class", "col-md-2 form-group has-error")
             warningword += "【难度】"
             flag = false
         }
         else {
-            $(obj).parent().parent().children("div").eq(1).attr("class", "col-md-2 form-group")
+            $(obj).parent().parent().children("div").eq(3).attr("class", "col-md-2 form-group")
         }
         if (count_type == 0 || count_type == "") {
             warningword += "【题量】"
             flag = false
-            $(obj).parent().parent().children("div").eq(2).attr("class", "col-md-2 form-group has-error")
+            $(obj).parent().parent().children("div").eq(4).attr("class", "col-md-2 form-group has-error")
         }
         else {
-            $(obj).parent().parent().children("div").eq(2).attr("class", "col-md-2 form-group")
+            $(obj).parent().parent().children("div").eq(4).attr("class", "col-md-2 form-group")
         }
         if (flag == false) {
             $("#detail_warning").html(warningword + "有错误")
@@ -465,6 +486,23 @@
             $("#detail_warning").html("")
             $("#detail_warning").attr("hidden", "hidden")
         }
+        $.each($(obj).parent().parent().next().next().children("tbody").eq(0).children("tr"), function (tridx, trobj) {
+            if($(trobj).children("td").eq(2).children("span").eq(0).text() == section && $(trobj).children("td").eq(3).children("span").eq(0).text() == difficulty)
+            {
+                flag = false
+            }
+        })
+        if (flag == false)
+        {
+            $("#detail_warning").html("相同章节相同难度的题目只能出现一次")
+            $("#detail_warning").removeAttr("hidden")
+            return
+        }
+        else
+        {
+            $("#detail_warning").html("")
+            $("#detail_warning").attr("hidden", "hidden")
+        }
         var html = $("#Detail_Content_" + questiontype).html();
         html += '<tr>' +
                     '<td><span style="display:none">' + course + '</span>' + coursename + '</td>' +
@@ -472,30 +510,43 @@
                     '<td><span style="display:none">' + section + '</span>' + sectionname + '</td>' +
                     '<td><span style="display:none">' + difficulty + '</span>' + difficultyname + '</td>' +
                     '<td><span style="display:none">' + count_type + '</span>' + count_type + '</td>' +
-                    '<td><button id="Del_Detail" onclick="Del_Detail(this)" class="btn btn-warning" type="button">删除</button></td>' +
+                    '<td><button id="Del_Detail" onclick="Del_Detail(this,'+questioncount+')" class="btn btn-warning" type="button">删除</button></td>' +
                 '</tr>'
         $("#Detail_Content_" + questiontype).html(html)
+        var typetotalcount = 0
+        $.each($(obj).parent().parent().next().next().children("tbody").eq(0).children("tr"), function (trindex, trobj) {
+            typetotalcount += parseInt($(trobj).children("td").eq(4).children("span").eq(0).text())
+        })
+        if(typetotalcount == questioncount)
+        {
+            $(obj).parent().parent().parent().next().children("button").eq(1).removeAttr("disabled")
+        }
+        else
+        {
+            $(obj).parent().parent().parent().next().children("button").eq(1).attr("disabled","disabled")
+        }
     }
     function Create() {
         var paperlist = []
-        var obj = $("#Content")
-        obj.children("tr").each(function () {
+        $("#final").find("tbody").each(function () {
             var paper = {}
-            var course = $(this).children("td").eq(0).attr("id");
-            var questiontype = $(this).children("td").eq(1).attr("id");
-            var section = $(this).children("td").eq(2).attr("id");
-            var difficulty = $(this).children("td").eq(3).attr("id");
-            var count = $(this).children("td").eq(4).attr("id")
-            paper = {
-                paperproperty: {
-                    course: course,
-                    questiontype: questiontype,
-                    section: section,
-                    difficulty: difficulty
-                },
-                count: count
-            }
-            paperlist.push(paper)
+            $.each($(this).children("tr"), function (index, obj) {
+                var courseid = $(obj).children("td").eq(0).children("span").eq(0).text()
+                var questiontypeid = $(obj).children("td").eq(1).children("span").eq(0).text()
+                var sectionid = $(obj).children("td").eq(2).children("span").eq(0).text()
+                var difficultyid = $(obj).children("td").eq(3).children("span").eq(0).text()
+                var count = $(obj).children("td").eq(4).children("span").eq(0).text()
+                paper = {
+                    paperproperty: {
+                        course: courseid,
+                        questiontype: questiontypeid,
+                        section: sectionid,
+                        difficulty: difficultyid
+                    },
+                    count: count
+                }
+                paperlist.push(paper)
+            })
         })
         $.ajax({
             url: "/api/DownloadTestPaperAPI/GetQuestionID/",
@@ -504,21 +555,23 @@
             data: { "": paperlist },
             //data: JSON.stringify(paperlist),
             beforeSend: function () {
-                $("#create").text("正在生成")
+                
             },
             success: function (result) {
-                alert("生成成功")
-                $("#create").text("生成")
-
-
                 var curWwwPath = window.document.location.href;    //获取当前url
                 var pathName = window.document.location.pathname;
                 var pos = curWwwPath.indexOf(pathName);
                 var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
-
-
-                console.log(localhostPath + "/Upload/Output/out.docx")
-                window.open(localhostPath + "/Upload/Output/out.docx")
+                alert("生成成功")
+                var html = ""
+                $("#testpaper").show()
+                var width = parseInt($("#testpapertable").find("th").first().innerWidth())-4
+                $.each(result, function (index, obj) {
+                    html += '<tr><td colspan="4"><iframe width="' + width + '" id=' + obj.ID + ' src="' + localhostPath + '/Upload/' + obj.Course + '/' + obj.Section + '/' + obj.Type + '/' + obj.Difficulty + '/files/' + obj.ID + '.html"></iframe></td><td rowspan="2" style="text-align:center;vertical-align:middle"><button class="btn btn-primary" onclick="ChangeIt(this)">换题</button></td></tr><tr><td id="'+obj.Course+'">课程名称：' + obj.CourseName + '</td><td id="'+obj.Section+'">章节名称：' + obj.SectionName + '</td><td id="'+obj.Type+'">题型：' + obj.TypeName + '</td><td id="'+obj.Difficulty+'">难度：' + obj.DifficultyName + '</td></tr>'
+                })
+                $("#testpapertable").children("tbody").eq(0).html(html)
+                $("#final").hide()
+                //window.open(localhostPath + "/Upload/Output/out.docx")
             }
         })
     }
@@ -531,7 +584,66 @@
         var newscore = parseInt(oldscore) - parseInt($(obj).parent().parent().children("td").eq(3).text())
         $("#total_score").text("总分：" + newscore)
     }
-    function Del_Detail(obj) {
+    function Del_Detail(obj,typetotalcount) {
+        
+        var totalcount = 0
+        $.each($(obj).parent().parent().parent().children("tr"), function (trindex, trobj) {
+            totalcount += parseInt($(trobj).children("td").eq(4).children("span").eq(0).text())
+        })
+        console.log(parseInt($(obj).parent().prev().children("span").eq(0).text()))
+        totalcount -= parseInt($(obj).parent().prev().children("span").eq(0).text())
+        if(totalcount == typetotalcount)
+        {
+            $(obj).parent().parent().parent().parent().parent().next().children("button").eq(1).removeAttr("disabled")
+        }
+        else
+        {
+            $(obj).parent().parent().parent().parent().parent().next().children("button").eq(1).attr("disabled","disabled")
+        }
+        console.log(totalcount)
         $(obj).parent().parent().remove()
+    }
+    function ChangeIt(obj)
+    {
+        var oldidlist = []
+        $.each($(obj).parent().parent().parent().find("iframe"), function (idx, iframeobj) {
+            oldidlist.push($(iframeobj).attr("id"))
+        })
+        //var oldquestionid = $(obj).parent().prev().children("iframe").attr("id")
+        var courseid = $(obj).parent().parent().next().children("td").eq(0).attr("id")
+        var sectionid = $(obj).parent().parent().next().children("td").eq(1).attr("id")
+        var questiontypeid = $(obj).parent().parent().next().children("td").eq(2).attr("id")
+        var difficultyid = $(obj).parent().parent().next().children("td").eq(3).attr("id")
+        var paper = {
+            paperproperty: {
+                questiontype: questiontypeid,
+                course: courseid,
+                section: sectionid,
+                difficulty: difficultyid
+            },
+            count:1
+        }
+        $.ajax({
+            url: "/api/DownloadTestPaperAPI/GetOneQuestion/",
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify({ oldidlist: oldidlist, paper: paper }),
+            //data: { "": paper,"": oldquestionid},
+            //data: JSON.stringify(paperlist),
+            beforeSend: function () {
+
+            },
+            success: function (result) {
+                console.log(result)
+                var curWwwPath = window.document.location.href;    //获取当前url
+                var pathName = window.document.location.pathname;
+                var pos = curWwwPath.indexOf(pathName);
+                var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
+                var html = ""
+                $(obj).parent().prev().children("iframe").eq(0).attr("src", localhostPath + '/Upload/' + result.Course + '/' + result.Section + '/' + result.Type + '/' + result.Difficulty + '/files/' + result.ID + '.html')
+                //window.open(localhostPath + "/Upload/Output/out.docx")
+                $(obj).parent().prev().children("iframe").eq(0).attr("id",result.ID)
+            }
+        })
     }
 </script>

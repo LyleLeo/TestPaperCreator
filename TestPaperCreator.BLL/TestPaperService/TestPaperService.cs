@@ -41,5 +41,9 @@ namespace TestPaperCreator.BLL.TestPaperService
         {
             DAL.TestPaperService.TestPaperService.ClearQuestionMark(tobecleared);
         }
+        public static MODEL.TestPaper.Question GetOneQuestion(MODEL.TestPaper.Paper paper,List<int> oldidlist)
+        {
+            return DAL.TestPaperService.TestPaperService.GetOneQuestion(paper, oldidlist);
+        }
     }
 }

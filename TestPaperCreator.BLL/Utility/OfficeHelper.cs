@@ -334,8 +334,9 @@ namespace TestPaperCreator.BLL.OfficeHelper
                 //如果存在则删除
                 File.Delete(localpath + "\\Output\\out.docx");
             }
-            //把问题复制到Output文件夹
+            //获取试题列表字典
             IDictionary<int,List<int>> typequestionidDic = DAL.TestPaperService.TestPaperService.GetQuestionID(paperlist);
+            //把问题复制到Output文件夹
             List<MODEL.TestPaper.Question> questionlist = new List<MODEL.TestPaper.Question>();
             foreach (int questiontypeid in typequestionidDic.Keys)
             {
@@ -343,28 +344,28 @@ namespace TestPaperCreator.BLL.OfficeHelper
                 {
                     MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(id);
                     questionlist.Add(question);
-                    string sourceurl = localpath + "\\" + question.Course.ToString() + "\\" + question.Section.ToString() + "\\" + question.Type.ToString() + "\\" + question.Difficulty.ToString() + "\\";
-                    string destinationurl = localpath + "\\Output\\Questions\\" + question.Type.ToString() + "\\";
-                    string sourceFile = sourceurl + question.ID.ToString() + ".docx";
-                    string destinationFile = localpath + "\\Output\\Questions\\" + question.Type.ToString() + "\\" + question.ID.ToString() + ".docx";
-                    if (!Directory.Exists(destinationurl))
-                    {
-                        Directory.CreateDirectory(destinationurl);
-                    }
-                    bool isrewrite = true; // true=覆盖已存在的同名文件,false则反之
-                    File.Copy(sourceFile, destinationFile, isrewrite);
+                    //string sourceurl = localpath + "\\" + question.Course.ToString() + "\\" + question.Section.ToString() + "\\" + question.Type.ToString() + "\\" + question.Difficulty.ToString() + "\\";
+                    //string destinationurl = localpath + "\\Output\\Questions\\" + question.Type.ToString() + "\\";
+                    //string sourceFile = sourceurl + question.ID.ToString() + ".docx";
+                    //string destinationFile = localpath + "\\Output\\Questions\\" + question.Type.ToString() + "\\" + question.ID.ToString() + ".docx";
+                    //if (!Directory.Exists(destinationurl))
+                    //{
+                    //    Directory.CreateDirectory(destinationurl);
+                    //}
+                    //bool isrewrite = true; // true=覆盖已存在的同名文件,false则反之
+                    //File.Copy(sourceFile, destinationFile, isrewrite);
                 }   
             }
-            string templatefile = localpath + "\\Output\\templet.dotx";
-            string outfile = localpath + "\\Output\\out.dotx";
-            File.Copy(templatefile, outfile, true);//复制模板文件
-            string tempDoc = localpath + "\\Output\\templet.dotx";
-            string strCopyFolder = localpath + "\\Output\\Questions\\";
-            string outDoc = localpath + "\\Output\\out.docx";
-            foreach(int typeid in typequestionidDic.Keys)
-            {
-                OpenXmlForOffice.CreatePaper(tempDoc, outDoc, strCopyFolder + typeid.ToString() + "\\", typeid);
-            }
+            //string templatefile = localpath + "\\Output\\templet.dotx";
+            //string outfile = localpath + "\\Output\\out.dotx";
+            //File.Copy(templatefile, outfile, true);//复制模板文件
+            //string tempDoc = localpath + "\\Output\\templet.dotx";
+            //string strCopyFolder = localpath + "\\Output\\Questions\\";
+            //string outDoc = localpath + "\\Output\\out.docx";
+            //foreach(int typeid in typequestionidDic.Keys)
+            //{
+            //    OpenXmlForOffice.CreatePaper(tempDoc, outDoc, strCopyFolder + typeid.ToString() + "\\", typeid);
+            //}
             
             //WordDocumentMerger wordmeger = new WordDocumentMerger();
             //wordmeger.InsertMerge(tempDoc, strCopyFolder, outDoc);

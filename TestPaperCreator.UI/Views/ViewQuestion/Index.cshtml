@@ -164,19 +164,6 @@
         //$(obj).parent().parent().remove()
     }
 
-    function hello(obj) {
-        //alert($(obj).children("a").eq(0).children("span").attr("class"))
-        if ($(obj).children("a").eq(0).children("span").attr("class") == "glyphicon glyphicon-plus") {
-            $(obj).children("a").eq(0).children("span").attr("class", "glyphicon glyphicon-minus")
-            $(obj).parents("tr").eq(0).next("tr").removeAttr("hidden")
-        }
-        else {
-            $(obj).children("a").eq(0).children("span").attr("class", "glyphicon glyphicon-plus")
-            $(obj).parents("tr").eq(0).next("tr").attr("hidden", "hidden")
-        }
-
-    }
-
     function getAttarchmentPath(d)
     {
         var curWwwPath = window.document.location.href;

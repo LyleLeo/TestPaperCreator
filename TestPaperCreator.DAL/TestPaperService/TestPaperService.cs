@@ -198,7 +198,29 @@ namespace TestPaperCreator.DAL.TestPaperService
             return paperDic;
         }
         #endregion
-
+        #region 更换题目
+        public static MODEL.TestPaper.Question GetOneQuestion(MODEL.TestPaper.Paper paper,List<int> oldidlist)
+        {
+            int course = paper.paperproperty.course;
+            int section = paper.paperproperty.section;
+            int questiontype = paper.paperproperty.questiontype;
+            int difficulty = paper.paperproperty.difficulty;
+            string sql = "select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Weight in(select MIN(Weight) from Questions)  and Flag=1";
+            DataSet results = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+            List<int> a = new List<int>();
+            foreach (DataRow dr in results.Tables[0].Rows)
+            {
+                a.Add((int)dr[0]);
+            }
+            Random rd = new Random();
+            int result = rd.Next(1, a.Count);
+            while (oldidlist.Contains(a[result]))
+            {
+                result = rd.Next(0, a.Count);
+            }
+            return GetAQuestionByID(a[result]);
+        }
+        #endregion
         #region 根据条件查询试题
         /// <summary>
         /// 根据条件查询试题
