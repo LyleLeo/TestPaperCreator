@@ -8,7 +8,9 @@ using DocumentFormat.OpenXml.Vml;
 using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
+using DocumentFormat.OpenXml.Vml.Office;
 
+using OpenXmlPowerTools;
 
 namespace TestPaperCreator.BLL.Utility
 {
@@ -199,7 +201,14 @@ namespace TestPaperCreator.BLL.Utility
                     {
                         documentisend = true;
                         flag++;
-                        OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + ".docx");
+                        try
+                        {
+                            OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + ".docx");
+                        }
+                        catch (Exception e)
+                        {
+                            throw e;
+                        }
                         DAL.TestPaperService.TestPaperService.InsertQuestion(question.Course, question.Type, question.Section, question.Difficulty, sb.ToString().Trim());
                         sb.Length = 0;//清空stringbuilder
                         continue;
@@ -211,7 +220,14 @@ namespace TestPaperCreator.BLL.Utility
                 {
                     if (documentisend)
                     {
-                        CreateDocx(file, maxid.ToString() + "_answer");
+                        try
+                        {
+                            CreateDocx(file, maxid.ToString() + "_answer");
+                        }
+                        catch (Exception e)
+                        {
+                            throw e;
+                        }
                         documentisend = false;
                     }
                     if (p.InnerText == "@")
@@ -229,42 +245,257 @@ namespace TestPaperCreator.BLL.Utility
         }
         #endregion
 
-        #region 合并WORD文档
-        public static void CreatePaper(string templet, string outfile, string strCopyFolder, int questiontype)
+        #region 打开一个文档，添加一道小题
+        private static void OpenAndAddParagraphToWordDocument(string filepath, List<Paragraph> paragraphlist, WordprocessingDocument wordprocessingDocument, string typeName)
         {
-            string[] arrFiles = Directory.GetFiles(strCopyFolder);
-            foreach (string file in arrFiles)
-            {
-                //题目文件
-                WordprocessingDocument wordprocessingDocument = WordprocessingDocument.Open(templet, true);
-                IDictionary<string, BookmarkStart> bookmarkDic = new Dictionary<String, BookmarkStart>();
-                foreach (BookmarkStart bookmarkstart in wordprocessingDocument.MainDocumentPart.RootElement.Descendants<BookmarkStart>())
-                {
-                    bookmarkDic[bookmarkstart.Name] = bookmarkstart;
-                }
-                wordprocessingDocument.Close();
-                wordprocessingDocument = WordprocessingDocument.Open(file, true);
-                string questiontypename;
-                if (questiontype == 1)
-                {
-                    questiontypename = "ChoiceQ";
-                }
-                else
-                {
-                    questiontypename = "ChoiceQ";
-                }
-                if (bookmarkDic.Keys.Contains(questiontypename))
-                {
-                    BookmarkStart bookmarkstart = bookmarkDic[questiontypename];
-                    Paragraph refParagraph = (Paragraph)bookmarkstart.Parent;
-                    foreach (Paragraph p in wordprocessingDocument.MainDocumentPart.Document.Descendants<Paragraph>())
-                    {
-                        OpenAndAddParagraphToWordDocument(templet, p, wordprocessingDocument, refParagraph);
-                    }
-                }
 
+        }
+        #endregion
+
+        #region 将大题合并到试卷
+        public static void MergeDatiToPaper(string paperhead, string strCopyFolder)
+        {
+            string name = Guid.NewGuid().ToString();
+            #region 复制大题模板并转换为docx格式
+            string sourceFile = paperhead;
+            if (!Directory.Exists(System.IO.Path.GetDirectoryName(paperhead) + @"\final\"))
+            {
+                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(paperhead) + @"\final\");
+            }
+            string paperbody_copy = System.IO.Path.GetDirectoryName(paperhead) + @"\final\" + name + ".docx";
+            bool isrewrite = true; // true=覆盖已存在的同名文件,false则反之
+            File.Copy(sourceFile, paperbody_copy, isrewrite);
+            WordprocessingDocument wpd = WordprocessingDocument.Open(paperbody_copy, true);
+            wpd.ChangeDocumentType(WordprocessingDocumentType.Document);
+            wpd.Close();
+            #endregion
+            string[] datis = Directory.GetFiles(strCopyFolder, "*.docx");
+            WordprocessingDocument paperheadobj = WordprocessingDocument.Open(paperbody_copy, true);
+            foreach (string dati in datis)
+            {
+                WordprocessingDocument datiobj = WordprocessingDocument.Open(dati, true);
+                foreach (OpenXmlElement oxe in datiobj.MainDocumentPart.Document.Body.ChildElements)
+                {
+                    foreach (OpenXmlElement b in oxe.Descendants<BookmarkStart>())
+                    {
+                        b.Remove();
+                    }
+                    foreach (OpenXmlElement b in oxe.Descendants<BookmarkEnd>())
+                    {
+                        b.Remove();
+                    }
+                    //Paragraph refparagraph = paperbodyobj.MainDocumentPart.RootElement.Descendants<Paragraph>().Last();
+                    foreach (EmbeddedObject embedobj in oxe.Descendants<EmbeddedObject>())
+                    {
+
+                        foreach (OleObject oleobject in embedobj.Descendants<OleObject>())
+                        {
+                            string rid = oleobject.Id;
+                            IdPartPair relationship = datiobj.MainDocumentPart.Parts.Single(i => i.RelationshipId == rid);
+                            paperheadobj.MainDocumentPart.AddPart(relationship.OpenXmlPart, rid);
+                        }
+                        foreach (ImageData imgdata in embedobj.Descendants<ImageData>())
+                        {
+                            string rid = imgdata.RelationshipId;
+                            IdPartPair imgrel = datiobj.MainDocumentPart.Parts.Single(i => i.RelationshipId == rid);
+                            paperheadobj.MainDocumentPart.AddPart(imgrel.OpenXmlPart, rid);
+                        }
+                    }
+                    paperheadobj.MainDocumentPart.Document.Body.AppendChild(oxe.CloneNode(true));
+                }
+                datiobj.Close();
+            }
+            paperheadobj.Close();
+        }
+        #endregion
+
+        #region 插入大题
+        public static void InsertDaTi(string paperhead, string paperbody, string copyfiles, Dictionary<int, SingleDaTi> type)
+        {
+            WordprocessingDocument paperheadobj = WordprocessingDocument.Open(paperhead, true);
+            List<IdPartPair> plist = paperheadobj.MainDocumentPart.Parts.ToList();
+            int maxrid = 0;
+            foreach (IdPartPair ipp in plist)
+            {
+                string rid = ipp.RelationshipId;
+                rid = rid.Replace("rId", "*").Split('*')[1];
+                if (Convert.ToInt32(rid) > maxrid)
+                    maxrid = Convert.ToInt32(rid) + 1;
+            }
+            int maxshapeid = 1025;
+            string shapeid = "";
+            if (paperheadobj.MainDocumentPart.RootElement.Descendants<Shape>().Where(i => i.Id.ToString().Split('_').Count() > 1).Count() != 0)
+            {
+                shapeid = paperheadobj.MainDocumentPart.RootElement.Descendants<Shape>().Last().Id.ToString();
+                shapeid = shapeid.Replace("_x0000_i", "*");
+                maxshapeid = Convert.ToInt32(shapeid.Split('*')[1]) + 1;
+            }
+            int maxshapetype = 75;
+            string shapetype = "";
+            if (paperheadobj.MainDocumentPart.RootElement.Descendants<Shapetype>().Count() != 0)
+            {
+                shapetype = paperheadobj.MainDocumentPart.RootElement.Descendants<Shapetype>().Last().Id;
+                shapetype = shapetype.Replace("_x0000_t", "*");
+                maxshapetype = Convert.ToInt32(shapetype.Split('*')[1]) + 1;
+            }
+            paperheadobj.Close();
+            EmbedIDCounter eic = new EmbedIDCounter();
+            eic.MaxrId = maxrid;
+            eic.MaxshapeId = maxshapeid;
+            eic.MaxshapeType = maxshapetype;
+            foreach (int tihao in type.Keys)
+            {
+                //复制大题模板
+                #region 复制大题模板并转换为docx格式
+                string sourceFile = paperbody;
+                string paperbody_copy = System.IO.Path.GetDirectoryName(paperbody) + @"\" + tihao.ToString() + ".docx";
+                bool isrewrite = true; // true=覆盖已存在的同名文件,false则反之
+                File.Copy(sourceFile, paperbody_copy, isrewrite);
+                WordprocessingDocument wpd = WordprocessingDocument.Open(paperbody_copy, true);
+                wpd.ChangeDocumentType(WordprocessingDocumentType.Document);
+                wpd.Close();
+                #endregion
+                int tixing = type[tihao].Type;
+                int count = type[tihao].Count;
+                int score = type[tihao].Score;
+                int total_count = count * score;
+                //获取题型中文名
+                string tixingmingzi = "选择题";
+                string[] xiaotifiles = Directory.GetFiles(copyfiles + @"\" + tihao.ToString());
+                //WordprocessingDocument paperbodyobj = WordprocessingDocument.Open(paperbody_copy, true);
+
+                eic = InsertXiaoTi(tixing, count, score, total_count, tixingmingzi, tihao, xiaotifiles, paperbody_copy, eic);
             }
         }
         #endregion
+
+        #region 插入小题
+        public static EmbedIDCounter InsertXiaoTi(int tixing, int count, int score, int total_count, string tixingmingzi, int tihao, string[] xiaotifiles, string paperbody_copy, EmbedIDCounter eic)
+        {
+            int maxrid = eic.MaxrId;
+            int maxshapeid = eic.MaxshapeId;
+            int maxshapetype = eic.MaxshapeType;
+
+            #region 设置大题题干
+            WordprocessingDocument paperbodyobjset = WordprocessingDocument.Open(paperbody_copy, true);
+            BookmarkStart bms_tihao = paperbodyobjset.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "QuestionNumber");
+            bms_tihao.Parent.Descendants<Run>().First().Descendants<Text>().First().Text = ListItemTextGetter_zh_CN.GetListItemText("大写", tihao, "chineseCounting");
+            BookmarkStart bms_tixing = paperbodyobjset.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "TypeName");
+            bms_tixing.NextSibling<Run>().Descendants<Text>().First().Text = tixingmingzi;
+            BookmarkStart bms_count = GetBookmarkStartByName(paperbodyobjset, "Count");
+            bms_count.NextSibling<Run>().Descendants<Text>().First().Text = count.ToString();
+            BookmarkStart bms_score = GetBookmarkStartByName(paperbodyobjset, "Score");
+            bms_score.NextSibling<Run>().Descendants<Text>().First().Text = score.ToString();
+            BookmarkStart bms_total_score = GetBookmarkStartByName(paperbodyobjset, "TotalScore");
+            string total_score = (score * count).ToString();
+            bms_total_score.NextSibling<Run>().Descendants<Text>().First().Text = total_score;
+            paperbodyobjset.Close();
+            #endregion
+            foreach (string file in xiaotifiles)
+            {
+                WordprocessingDocument paperbodyobj = WordprocessingDocument.Open(paperbody_copy, true);
+                WordprocessingDocument xiaotiobj = WordprocessingDocument.Open(file, false);
+                List<Paragraph> xiaotiparagraphlist = xiaotiobj.MainDocumentPart.RootElement.Descendants<Paragraph>().ToList();
+                foreach (Paragraph p in xiaotiparagraphlist)
+                {
+                    if (p.Descendants<Shapetype>().Count() != 0)
+                    {
+                        foreach (Shapetype st in p.Descendants<Shapetype>())
+                        {
+                            foreach (Shape sp in p.Descendants<Shape>().Where(i => i.Type == "#" + st.Id))
+                            {
+                                sp.Type = "#_x0000_t" + (maxshapetype + 1).ToString();
+                            }
+                            st.Id = "_x0000_t" + (maxshapetype + 1).ToString();
+                            st.OptionalNumber = maxshapetype + 1;
+                            maxshapetype++;
+                        }
+                    }
+                    foreach (OpenXmlElement b in p.Descendants<BookmarkStart>())
+                    {
+                        b.Remove();
+                    }
+                    foreach (OpenXmlElement b in p.Descendants<BookmarkEnd>())
+                    {
+                        b.Remove();
+                    }
+                    Paragraph refparagraph = paperbodyobj.MainDocumentPart.RootElement.Descendants<Paragraph>().Last();
+                    foreach (EmbeddedObject embedobj in p.Descendants<EmbeddedObject>())
+                    {
+                        foreach (OleObject oleobject in embedobj.Descendants<OleObject>())
+                        {
+                            string rid = oleobject.Id;
+                            p.Descendants<OleObject>().First(i => i.Id == rid).Parent.Descendants<Shape>().First().Id = "_x0000_i" + (maxshapeid + 1).ToString();
+                            p.Descendants<OleObject>().First(i => i.Id == rid).ShapeId = "_x0000_i" + (maxshapeid + 1).ToString();
+                            p.Descendants<OleObject>().First(i => i.Id == rid).Id = "rId" + (maxrid + 1).ToString();
+                            IdPartPair relationship = xiaotiobj.MainDocumentPart.Parts.Single(i => i.RelationshipId == rid);
+                            paperbodyobj.MainDocumentPart.AddPart(relationship.OpenXmlPart, "rId" + (maxrid + 1).ToString());
+                            maxshapeid++;
+                            maxrid++;
+                        }
+                        foreach (ImageData imgdata in embedobj.Descendants<ImageData>())
+                        {
+                            string rid = imgdata.RelationshipId;
+                            IdPartPair imgrel = xiaotiobj.MainDocumentPart.Parts.Single(i => i.RelationshipId == rid);
+                            string newrid = "rId" + (maxrid + 1).ToString();
+                            p.Descendants<ImageData>().First(i => i.RelationshipId == rid).RelationshipId = "rId" + (maxrid + 1).ToString();
+                            paperbodyobj.MainDocumentPart.AddPart(imgrel.OpenXmlPart, "rId" + (maxrid + 1).ToString());
+                            maxrid++;
+                        }
+                    }
+                    paperbodyobj.MainDocumentPart.RootElement.GetFirstChild<Body>().AppendChild(p.CloneNode(true));
+                    //paperbodyobj.MainDocumentPart.Document.Body.InsertAfter<Paragraph>((Paragraph)p.CloneNode(true), refparagraph);
+                }
+                //paperbodyobj.MainDocumentPart.DocumentSettingsPart.FeedData(xiaotiobj.MainDocumentPart.DocumentSettingsPart.GetStream());
+                xiaotiobj.Close();
+                paperbodyobj.Close();
+            }
+            eic.MaxrId = maxrid;
+            eic.MaxshapeId = maxshapeid;
+            eic.MaxshapeType = maxshapetype;
+            return eic;
+        }
+        #endregion
+
+        #region 同过书签名称获取对象
+        public static BookmarkStart GetBookmarkStartByName(WordprocessingDocument obj, string name)
+        {
+            return obj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == name);
+        }
+        #endregion
+
+        #region 合并WORD文档
+        /// <summary>
+        /// 组成试卷的流程：
+        /// 1、首先把一个题型的各个小题组合成一个大题(例：15个选择题组合成一个选择大题)
+        /// 2、其次把大题依次插入到试卷头下面
+        /// 3、为了不影响大题秩序，题型临时文件夹名字按题号命名
+        /// </summary>
+        /// <param name="head">试卷头</param>
+        /// <param name="body">试卷大题</param>
+        /// <param name="outfile">输出文档</param>
+        /// <param name="strCopyFolder">待插入题的文件夹</param>
+        /// <param name="type">大题字典，key为题号，value为题型</param>
+        public static void CreatePaper(string paperhead, string paperbody, string outfile, string strCopyFolder, Dictionary<int, SingleDaTi> type)
+        {
+            //将小题组合成大题，按题号命名，放在OUT文件夹内
+            InsertDaTi(paperhead, paperbody, strCopyFolder, type);
+            //将大题合并成试卷
+            MergeDatiToPaper(paperhead, strCopyFolder);
+        }
+        #endregion
+
+    }
+    public class SingleDaTi
+    {
+        public int Type { get; set; }
+        public int Count { get; set; }
+        public int Score { get; set; }
+    }
+    public class EmbedIDCounter
+    {
+        public int MaxrId { get; set; }
+        public int MaxshapeId { get; set; }
+        public int MaxshapeType { get; set; }
     }
 }

@@ -392,7 +392,7 @@ namespace TestPaperCreator.BLL.OfficeHelper
             }
             catch (Exception e)
             {
-                throw;
+                throw e;
             }
         }
         /// <summary>

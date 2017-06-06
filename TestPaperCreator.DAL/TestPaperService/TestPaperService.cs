@@ -125,7 +125,7 @@ namespace TestPaperCreator.DAL.TestPaperService
             string sql = "SELECT MAX(ID) as maxid FROM Questions";
             var maxid = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
             //int maxid = SqlHelper.ExecuteNonQuery(conn, System.Data.CommandType.Text, sql);
-            return maxid == System.DBNull.Value ? 0 : (int)maxid;
+            return maxid == DBNull.Value ? 0 : (int)maxid;
         }
         #endregion
 
@@ -140,7 +140,7 @@ namespace TestPaperCreator.DAL.TestPaperService
         /// <returns>成功或失败</returns>
         public static void InsertQuestion(int course, int questiontype, int section, int difficulty, string content)
         {
-            string sql = "insert into Questions (Type, Course, Section, Difficulty, Weight, Time, Flag, Content) values (" + questiontype + "," + course + "," + section + "," + difficulty + ",0,'" + DateTime.Now.ToShortDateString() + "',1,'" + content + "')";
+            string sql = "insert into Questions (Type, Course, Section, Difficulty, Weight, Time, Flag) values (" + questiontype + "," + course + "," + section + "," + difficulty + ",0,'" + DateTime.Now.ToShortDateString() + "',1)";
             try
             {
                 SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
@@ -198,6 +198,7 @@ namespace TestPaperCreator.DAL.TestPaperService
             return paperDic;
         }
         #endregion
+
         #region 更换题目
         public static MODEL.TestPaper.Question GetOneQuestion(MODEL.TestPaper.Paper paper,List<int> oldidlist)
         {
@@ -221,6 +222,7 @@ namespace TestPaperCreator.DAL.TestPaperService
             return GetAQuestionByID(a[result]);
         }
         #endregion
+
         #region 根据条件查询试题
         /// <summary>
         /// 根据条件查询试题
@@ -336,5 +338,22 @@ namespace TestPaperCreator.DAL.TestPaperService
             SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
         }
         #endregion
+
+        #region 根据条件ID获取条件名称
+        /// <summary>
+        /// 根据条件ID获取条件名称
+        /// 例：输入1，Course，就能获取课程表中ID为1的课程的名称
+        /// </summary>
+        /// <param name="typeid">条件ID</param>
+        /// <param name="ConditionName">条件名称</param>
+        /// <returns>条件名称</returns>
+        public static string GetConditionNameByConditionID(int typeid,string ConditionName)
+        {
+            string sql = "select Value from " + ConditionName + " where ID = " + typeid;
+            var typename = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+            return typename == DBNull.Value ? "" : typename.ToString();
+        }
+        #endregion
+        
     }
 }

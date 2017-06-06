@@ -124,8 +124,8 @@
                 $('#' + file.id).find('p.state').text('已上传');
             });
 
-            uploader.on('uploadError', function (file) {
-                $('#' + file.id).find('p.state').text('上传出错');
+            uploader.on('uploadError', function (file,reason) {
+                $('#' + file.id).find('p.state').text('上传出错'+reason);
             });
 
             uploader.on('uploadComplete', function (file) {

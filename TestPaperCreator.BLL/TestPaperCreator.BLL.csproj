@@ -68,6 +68,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OxPt\OpenXmlPowerTools\OpenXmlPowerTools.csproj">
+      <Project>{6f957ff3-afcc-4d69-8fbc-71ae21bc45c9}</Project>
+      <Name>OpenXmlPowerTools</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TestPaperCreator.DAL\TestPaperCreator.DAL.csproj">
       <Project>{971c3cba-4592-4d5f-8804-6a9b7d9c27e9}</Project>
       <Name>TestPaperCreator.DAL</Name>

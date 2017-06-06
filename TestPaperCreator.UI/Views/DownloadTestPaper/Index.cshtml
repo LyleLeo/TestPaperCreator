@@ -2,23 +2,25 @@
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <select style="display:none" id="section_detail" class="form-control">
     <option selected value="0">选择章节</option>
     @foreach (var i in ViewBag.SectionList)
     {
-        <option value="@i.id">@i.value</option>
+    <option value="@i.id">@i.value</option>
     }
 </select>
+
 <select style="display:none" id="difficulty_detail" class="form-control">
     <option selected value="0">选择难度</option>
     @foreach (var i in ViewBag.DifficultyList)
     {
-        <option value="@i.id">@i.value</option>
+    <option value="@i.id">@i.value</option>
     }
 </select>
 
 <h1>下载试题</h1>
-<div class="panel panel-primary" style="color:black;display:none" id="testpaper">
+<div id="testpaper" class="panel panel-primary" style="color:black;display:none">
     <div class="panel-heading">试卷预览</div>
     <div class="panel-body">
         <div class="table-responsive">
@@ -29,12 +31,12 @@
                         <th colspan="1" width="10%">操作</th>
                     </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
     </div>
 </div>
+
 <div id="final" class="panel panel-primary" style="color:black;display:none">
     <div class="panel-heading">配置预览</div>
     <div class="panel-body">
@@ -64,7 +66,7 @@
                     <option selected value="0">选择课程</option>
                     @foreach (var i in ViewBag.CourseList)
             {
-                        <option value="@i.id">@i.value</option>
+                <option value="@i.id">@i.value</option>
                     }
                 </select>
 
@@ -91,6 +93,7 @@
         <button onclick="Create()" id="nextstep" class="btn btn-sm btn-success pull-right">下一步</button>
     </div>
 </div>
+
 <div id="basic_form" class="panel panel-primary" style="color:black">
     <div class="panel-heading">请填写基本资料</div>
     <div class="panel-body">
@@ -120,7 +123,7 @@
                     <option selected value="0">选择课程</option>
                     @foreach (var i in ViewBag.CourseList)
             {
-                        <option value="@i.id">@i.value</option>
+                <option value="@i.id">@i.value</option>
                     }
                 </select>
 
@@ -148,7 +151,7 @@
                     <option selected value="0">选择题型</option>
                     @foreach (var i in ViewBag.QuestionTypeList)
                     {
-                        <option value="@i.id">@i.value</option>
+                <option value="@i.id">@i.value</option>
                     }
                 </select>
             </div>
@@ -193,6 +196,7 @@
         $("#final").children("div").eq(1).children("table").last().remove()
         $(".container").children("div").last().show()
     }
+
     function Next_Step(obj) {
         $(obj).parent().parent().hide()
         Insert_Detail_To_Final(obj)
@@ -214,6 +218,7 @@
         }
 
     }
+
     function Insert_Detail_To_Final(obj) {
         var typename = $(obj).parent().parent().children("div").eq(1).children("div").eq(1).children("div").eq(1).find("option:selected").text()
         var s = $(obj).parent().prev().children(".table").eq(0).children("tbody").eq(0).html()
@@ -234,17 +239,19 @@
         s+
             '</tbody>'+
     '</table>'
-        
-        
+
+
         console.log($(obj).parent().prev().children(".table").eq(0).children("tbody").eq(0).html())
         $("#final").children("div").eq(1).append(html)
     }
+
     function Pre_Step(obj) {
         var pre_id = $(obj).attr("id").split("_")[1]
         $(obj).parent().parent().hide()
         $(obj).parent().parent().prev().show()
         $("#final").children("div").eq(1).children("table").last().remove()
     }
+
     function Create_Details() {
         $("#final").children("div").eq(1).children("table").remove()
         var basiclist = ["schoolname", "collegename", "majorname", "schoolyear", "term", "testtype", "course", "volume", "length", "testmethod", "grade", "class"]
@@ -285,6 +292,7 @@
         var firstid = $("#Content").children("tr").eq(0).children("td").eq(0).attr("id")
         $("#detail_" + firstid).show()
     }
+
     function Create_Details_Form(questiontypeid, questiontypename, courseid, coursename,questioncount,questionscore) {
         var sectionselect = document.getElementById("section_detail").outerHTML
         var difficultyselect = document.getElementById("difficulty_detail").outerHTML
@@ -340,6 +348,7 @@
 '</div>'
         return html
     }
+
     function Add() {
         var questiontype = $("#questiontype").find("option:selected").val()
         var questiontypename = $("#questiontype").find("option:selected").text()
@@ -441,6 +450,7 @@
         $("#total_count").text("总数：" + total_count)
         $("#total_score").text("总分：" + total_score)
     }
+
     function Add_Details(obj, questioncount) {
         var course = $(obj).parent().parent().children("div").eq(0).find("option:selected").val()
         var coursename = $(obj).parent().parent().children("div").eq(0).find("option:selected").text()
@@ -526,6 +536,7 @@
             $(obj).parent().parent().parent().next().children("button").eq(1).attr("disabled","disabled")
         }
     }
+
     function Create() {
         var paperlist = []
         $("#final").find("tbody").each(function () {
@@ -555,7 +566,7 @@
             data: { "": paperlist },
             //data: JSON.stringify(paperlist),
             beforeSend: function () {
-                
+
             },
             success: function (result) {
                 var curWwwPath = window.document.location.href;    //获取当前url
@@ -575,6 +586,7 @@
             }
         })
     }
+
     function Del(obj) {
         $(obj).parent().parent().remove()
         var oldcount = $("#total_count").text().split("：")[1]
@@ -584,8 +596,9 @@
         var newscore = parseInt(oldscore) - parseInt($(obj).parent().parent().children("td").eq(3).text())
         $("#total_score").text("总分：" + newscore)
     }
+
     function Del_Detail(obj,typetotalcount) {
-        
+
         var totalcount = 0
         $.each($(obj).parent().parent().parent().children("tr"), function (trindex, trobj) {
             totalcount += parseInt($(trobj).children("td").eq(4).children("span").eq(0).text())
@@ -603,6 +616,7 @@
         console.log(totalcount)
         $(obj).parent().parent().remove()
     }
+
     function ChangeIt(obj)
     {
         var oldidlist = []
