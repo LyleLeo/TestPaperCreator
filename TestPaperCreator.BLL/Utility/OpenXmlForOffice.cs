@@ -310,7 +310,7 @@ namespace TestPaperCreator.BLL.Utility
         #endregion
 
         #region 插入大题
-        public static void InsertDaTi(string paperhead, string paperbody, string copyfiles, Dictionary<int, SingleDaTi> type)
+        public static void InsertDaTi(string paperhead, string paperbody, string copyfiles, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
         {
             WordprocessingDocument paperheadobj = WordprocessingDocument.Open(paperhead, true);
             List<IdPartPair> plist = paperheadobj.MainDocumentPart.Parts.ToList();
@@ -339,7 +339,7 @@ namespace TestPaperCreator.BLL.Utility
                 maxshapetype = Convert.ToInt32(shapetype.Split('*')[1]) + 1;
             }
             paperheadobj.Close();
-            EmbedIDCounter eic = new EmbedIDCounter();
+            MODEL.TestPaper.EmbedIDCounter eic = new MODEL.TestPaper.EmbedIDCounter();
             eic.MaxrId = maxrid;
             eic.MaxshapeId = maxshapeid;
             eic.MaxshapeType = maxshapetype;
@@ -370,7 +370,7 @@ namespace TestPaperCreator.BLL.Utility
         #endregion
 
         #region 插入小题
-        public static EmbedIDCounter InsertXiaoTi(int tixing, int count, int score, int total_count, string tixingmingzi, int tihao, string[] xiaotifiles, string paperbody_copy, EmbedIDCounter eic)
+        public static MODEL.TestPaper.EmbedIDCounter InsertXiaoTi(int tixing, int count, int score, int total_count, string tixingmingzi, int tihao, string[] xiaotifiles, string paperbody_copy, MODEL.TestPaper.EmbedIDCounter eic)
         {
             int maxrid = eic.MaxrId;
             int maxshapeid = eic.MaxshapeId;
@@ -476,7 +476,7 @@ namespace TestPaperCreator.BLL.Utility
         /// <param name="outfile">输出文档</param>
         /// <param name="strCopyFolder">待插入题的文件夹</param>
         /// <param name="type">大题字典，key为题号，value为题型</param>
-        public static void CreatePaper(string paperhead, string paperbody, string outfile, string strCopyFolder, Dictionary<int, SingleDaTi> type)
+        public static void CreatePaper(string paperhead, string paperbody, string strCopyFolder, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
         {
             //将小题组合成大题，按题号命名，放在OUT文件夹内
             InsertDaTi(paperhead, paperbody, strCopyFolder, type);
@@ -486,16 +486,5 @@ namespace TestPaperCreator.BLL.Utility
         #endregion
 
     }
-    public class SingleDaTi
-    {
-        public int Type { get; set; }
-        public int Count { get; set; }
-        public int Score { get; set; }
-    }
-    public class EmbedIDCounter
-    {
-        public int MaxrId { get; set; }
-        public int MaxshapeId { get; set; }
-        public int MaxshapeType { get; set; }
-    }
+    
 }

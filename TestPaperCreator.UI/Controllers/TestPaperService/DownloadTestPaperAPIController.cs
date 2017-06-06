@@ -41,5 +41,40 @@ namespace TestPaperCreator.Controllers.TestPaperService
             MODEL.TestPaper.Paper paper = Newtonsoft.Json.JsonConvert.DeserializeObject<MODEL.TestPaper.Paper>(Convert.ToString(obj.paper));
             return BLL.TestPaperService.TestPaperService.GetOneQuestion(paper, oldidlist);
         }
+        [HttpPost]
+        [Route("api/DownloadTestPaperAPI/Generate/")]
+        public string Generate(dynamic obj)
+        {
+            string rootpath = System.Web.HttpContext.Current.Request.MapPath("/");
+            JArray questionlist = obj.questionlist;
+            Dictionary<int, int> questions = new Dictionary<int, int>();
+            foreach(var q in questionlist)
+            {
+                questions.Add(Convert.ToInt32(q["xiaotitihao"]), Convert.ToInt32(q["tihaoid"]));
+            }
+
+            JArray typelist = obj.typelist;
+            Dictionary<int, MODEL.TestPaper.SingleDaTi> type = new Dictionary<int, MODEL.TestPaper.SingleDaTi>();
+            foreach (var t in typelist)
+            {
+                MODEL.TestPaper.SingleDaTi dati = new MODEL.TestPaper.SingleDaTi();
+                dati.Type = Convert.ToInt32(t["singledati"]["type"]);
+                dati.Count = Convert.ToInt32(t["singledati"]["count"]);
+                dati.Score = Convert.ToInt32(t["singledati"]["score"]);
+                type.Add(Convert.ToInt32(t["tihao"]), dati);
+            }
+            BLL.TestPaperService.TestPaperService.CopyFiles(questions, rootpath, type);
+            string paperhead = rootpath + @"\Upload\OUT\TestPaperHead.dotx";
+            string paperbody = rootpath + @"\Upload\OUT\TestPaperBody.dotx";
+            string strCopyFolder = rootpath + @"\Upload\OUT\";
+            BLL.Utility.OpenXmlForOffice.CreatePaper(paperhead, paperbody, strCopyFolder, type);
+            string resultname = Path.GetFileName(Directory.GetFiles(rootpath + @"\Upload\OUT\final\")[0]);
+            return resultname;
+        }
+    }
+    class DaTi
+    {
+        string tihao { get; set; }
+        MODEL.TestPaper.SingleDaTi singledati { get; set; }
     }
 }

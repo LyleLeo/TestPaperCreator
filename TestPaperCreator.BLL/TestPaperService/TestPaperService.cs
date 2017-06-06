@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace TestPaperCreator.BLL.TestPaperService
@@ -44,6 +45,37 @@ namespace TestPaperCreator.BLL.TestPaperService
         public static MODEL.TestPaper.Question GetOneQuestion(MODEL.TestPaper.Paper paper, List<int> oldidlist)
         {
             return DAL.TestPaperService.TestPaperService.GetOneQuestion(paper, oldidlist);
+        }
+        public static void CopyFiles(Dictionary<int,int> questions,string rootpath, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
+        {
+            if (!Directory.Exists(rootpath + @"\Upload\OUT\"))
+            {
+                Directory.CreateDirectory(rootpath + @"\Upload\OUT\");
+            }
+            string[] templates = Directory.GetFiles(rootpath + @"\Files\", "*.dotx");
+            foreach(string template in templates)
+            {
+                string filename = Path.GetFileName(template);
+                File.Copy(template, rootpath+@"\Upload\OUT\"+filename, true);
+            }
+            foreach (int datitihao in type.Keys)
+            {
+                foreach (int tihao in questions.Keys)
+                {
+                    MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
+                    string course = question.Course.ToString();
+                    string section = question.Section.ToString();
+                    string questiontype = question.Type.ToString();
+                    string difficulty = question.Difficulty.ToString();
+                    string filepath = rootpath + @"\Upload\" + course + @"\" + section + @"\" + questiontype + @"\" + difficulty + @"\" + questions[tihao].ToString() + ".docx";
+                    if (!Directory.Exists(rootpath + @"\Upload\OUT\" + datitihao.ToString()))
+                    {
+                        Directory.CreateDirectory(rootpath + @"\Upload\OUT\" + datitihao.ToString());
+                    }
+                    string distpath = rootpath + @"\Upload\OUT\" + datitihao.ToString() + @"\" + tihao.ToString() + ".docx";
+                    File.Copy(filepath, distpath, true);
+                }
+            }
         }
     }
 }

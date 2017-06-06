@@ -35,6 +35,9 @@
             </table>
         </div>
     </div>
+    <div class="panel-footer">
+        <button class="btn btn-default" onclick="Generate()">生成</button>
+    </div>
 </div>
 
 <div id="final" class="panel panel-primary" style="color:black;display:none">
@@ -190,6 +193,62 @@
 </div>
 
 <script type="text/javascript">
+    function Generate()
+    {
+        var schoolname = $("#final_schoolname").val()
+        var collegename = $("#final_collegename").val()
+        var majorname = $("#final_majorname").val()
+        var schoolyear = $("#final_schoolyear").val()
+        var term = $("#final_term").val()
+        var testtype = $("#final_testtype").val()
+        var course = $("#final_course").val()
+        var volume = $("#final_volume").val()
+        var length = $("#final_length").val()
+        var testmethod = $("#final_testmethod").val()
+        var grade = $("#final_grade").val()
+        var classnumber = $("#final_class").val()
+        var tihao = 1
+        var typelist = []
+        $.each($("#Content").children("tr"), function (idx, obj) {
+            var type = {
+                tihao: tihao,
+                singledati: {
+                    type: $(obj).children("td").eq(0).attr("id"),
+                    count: $(obj).children("td").eq(1).text(),
+                    score: $(obj).children("td").eq(2).text(),
+                }
+            }
+            typelist.push(type)
+            tihao++;
+        })
+        var questionlist = []
+        var xiaotitihao = 1
+        $.each($("#testpapertable").children("tbody").first().find("iframe"), function (idx, obj) {
+            var xiaoti = {
+                xiaotitihao:xiaotitihao,
+                tihaoid:$(obj).attr("id")
+            }
+            questionlist.push(xiaoti)
+            xiaotitihao++
+        })
+        $.ajax({
+            url: "/api/DownloadTestPaperAPI/Generate/",
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify({ questionlist: questionlist, typelist: typelist }),
+            beforeSend: function () {
+
+            },
+            success: function (result) {
+                alert("生成成功")
+                var curWwwPath = window.document.location.href;    //获取当前url
+                var pathName = window.document.location.pathname;
+                var pos = curWwwPath.indexOf(pathName);
+                var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
+                window.open(localhostPath + "/Upload/OUT/final/" + result)
+            }
+        })
+    }
     function Back(obj)
     {
         $(obj).parent().parent().hide()
@@ -240,9 +299,7 @@
             '</tbody>'+
     '</table>'
 
-
-        console.log($(obj).parent().prev().children(".table").eq(0).children("tbody").eq(0).html())
-        $("#final").children("div").eq(1).append(html)
+    $("#final").children("div").eq(1).append(html)
     }
 
     function Pre_Step(obj) {
@@ -278,13 +335,11 @@
             var coursename = $("#course").find("option:selected").text()
             var questioncount = $(obj).children("td").eq(1).text()
             var questionscore = $(obj).children("td").eq(2).text()
-            console.log(typename)
             html += Create_Details_Form(typeid, typename, courseid, coursename,questioncount,questionscore)
         })
         $("#basic_form").after(html)
         $.each($(".container").children("div"), function (index, obj) {
             if ($(obj).attr("type") == "step") {
-                console.log()
                 $(obj).find("select").removeAttr("style")
                 $(obj).children("select").eq(2).removeAttr("style")
             }
@@ -603,7 +658,6 @@
         $.each($(obj).parent().parent().parent().children("tr"), function (trindex, trobj) {
             totalcount += parseInt($(trobj).children("td").eq(4).children("span").eq(0).text())
         })
-        console.log(parseInt($(obj).parent().prev().children("span").eq(0).text()))
         totalcount -= parseInt($(obj).parent().prev().children("span").eq(0).text())
         if(totalcount == typetotalcount)
         {
@@ -613,7 +667,6 @@
         {
             $(obj).parent().parent().parent().parent().parent().next().children("button").eq(1).attr("disabled","disabled")
         }
-        console.log(totalcount)
         $(obj).parent().parent().remove()
     }
 
@@ -648,7 +701,6 @@
 
             },
             success: function (result) {
-                console.log(result)
                 var curWwwPath = window.document.location.href;    //获取当前url
                 var pathName = window.document.location.pathname;
                 var pos = curWwwPath.indexOf(pathName);

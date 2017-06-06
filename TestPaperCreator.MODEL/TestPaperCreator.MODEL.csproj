@@ -45,6 +45,7 @@
     <Compile Include="TestPaper\Condition.cs" />
     <Compile Include="TestPaper\Paper.cs" />
     <Compile Include="TestPaper\Question.cs" />
+    <Compile Include="TestPaper\Type.cs" />
     <Compile Include="Utility\Result.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
