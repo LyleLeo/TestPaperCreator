@@ -33,7 +33,7 @@
         </select>
         <button class="btn" onclick="edit(this,0)">删除</button>
         <input placeholder="请输入课程名称" class="form-control" />
-        <button class="btn">添加</button>
+        <button onclick="edit(this,1)" class="btn">添加</button>
     </div>
 </div>
 <div class="form-group">
@@ -48,7 +48,7 @@
         </select>
         <button class="btn" onclick="edit(this,0)">删除</button>
         <input placeholder="请输入课程名称" class="form-control" />
-        <button class="btn">添加</button>
+        <button onclick="edit(this,1)" class="btn">添加</button>
     </div>
 </div>
 <div class="form-group">
@@ -63,7 +63,7 @@
         </select>
         <button class="btn" onclick="edit(this,0)">删除</button>
         <input placeholder="请输入课程名称" class="form-control" />
-        <button class="btn">添加</button>
+        <button onclick="edit(this,1)" class="btn">添加</button>
     </div>
 </div>
 <div class="form-group">
@@ -86,11 +86,8 @@
             url: "/api/ManageAPI/EditCondition/",
             type: "POST",
             contentType: 'application/json',
-            //data: { "": paperlist },
             data: JSON.stringify({Condition:condition,Value:value,Flag:flag}),
             beforeSend: function () {
-                //$("#submit").val("正在登录中")
-                //$("#submit").attr("disabled", "disabled")
             },
             success: function (result) {
                 window.location.reload()

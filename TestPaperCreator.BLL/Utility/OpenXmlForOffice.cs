@@ -114,7 +114,6 @@ namespace TestPaperCreator.BLL.Utility
             {
                 string rid = GetEmbedObjectID(obj);
                 IdPartPair ip = wordprocessingDocument.MainDocumentPart.Parts.Single(p => p.RelationshipId == rid);
-                EmbeddedObjectPart eop = wordprocessingDocument.MainDocumentPart.EmbeddedObjectParts.Single(q => q.Uri == ip.OpenXmlPart.Uri);
                 distwordprocessingDocument.MainDocumentPart.AddPart(ip.OpenXmlPart, rid);
 
             }
@@ -396,6 +395,20 @@ namespace TestPaperCreator.BLL.Utility
                 WordprocessingDocument paperbodyobj = WordprocessingDocument.Open(paperbody_copy, true);
                 WordprocessingDocument xiaotiobj = WordprocessingDocument.Open(file, false);
                 List<Paragraph> xiaotiparagraphlist = xiaotiobj.MainDocumentPart.RootElement.Descendants<Paragraph>().ToList();
+                //加入题号
+                
+                string number = System.IO.Path.GetFileName(file).Replace("*",".docx");
+                number = number.Split('*')[0];
+                Run run1 = new Run();
+                RunProperties runProperties1 = new RunProperties();
+                RunFonts runFonts1 = new RunFonts() { Hint = FontTypeHintValues.EastAsia, Ascii = "宋体", HighAnsi = "宋体" };
+                runProperties1.Append(runFonts1);
+                Text text1 = new Text();
+                text1.Text = number+". ";
+                run1.Append(runProperties1);
+                run1.Append(text1);
+                xiaotiobj.MainDocumentPart.RootElement.Descendants<Paragraph>().First().InsertBefore(run1, xiaotiobj.MainDocumentPart.RootElement.Descendants<Paragraph>().First().ChildElements.First<Run>());
+                //xiaotiobj.MainDocumentPart.RootElement.First<Paragraph>().InsertBefore(run1, xiaotiobj.MainDocumentPart.Document.Body.First<Paragraph>().First<Run>)
                 foreach (Paragraph p in xiaotiparagraphlist)
                 {
                     if (p.Descendants<Shapetype>().Count() != 0)
