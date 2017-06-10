@@ -202,7 +202,7 @@ namespace TestPaperCreator.BLL.Utility
                         flag++;
                         try
                         {
-                            OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + ".docx");
+                            OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + ".docx",file+maxid.ToString()+".html");
                         }
                         catch (Exception e)
                         {
@@ -233,7 +233,7 @@ namespace TestPaperCreator.BLL.Utility
                     {
                         documentisend = true;
                         flag++;
-                        OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + "_answer.docx");
+                        OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + "_answer.docx",file+maxid.ToString()+"_answer.html");
                         maxid++;
                         continue;
                     }

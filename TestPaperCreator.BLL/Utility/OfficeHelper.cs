@@ -428,5 +428,55 @@ namespace TestPaperCreator.BLL.OfficeHelper
             word.Quit();
             //File.Delete(path);
         }
+        #region 把word文档转化为HTML文件
+        //// <summary>
+        /// 把Word文档装化为Html文件
+        /// </summary>
+        /// <param name="strFileName">要转换的Word文档</param>
+        /// <param name="strSaveFileName">要生成的具体的Html页面</param>
+        public static void ConvertDocxToHtml(string strFileName, string strSaveFileName)
+        {
+            ApplicationClass WordApp;
+            Document WordDoc;
+            Object oMissing = Missing.Value;
+            WordApp = new ApplicationClass();
+            object fileName = strFileName;
+
+            WordDoc = WordApp.Documents.Open(ref fileName,
+               ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+               ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing,
+               ref oMissing, ref oMissing, ref oMissing, ref oMissing, ref oMissing);
+
+            Type wordType = WordApp.GetType();
+            // 打开文件
+            Type docsType = WordApp.Documents.GetType();
+            // 转换格式，另存为
+            Type docType = WordDoc.GetType();
+            object saveFileName = strSaveFileName;
+            docType.InvokeMember("SaveAs", BindingFlags.InvokeMethod, null, WordDoc, new object[] { saveFileName, WdSaveFormat.wdFormatHTML });
+
+            #region 其它格式：
+            /**//**/
+                /**////wdFormatHTML
+                    ///wdFormatDocument
+                    ///wdFormatDOSText
+                    ///wdFormatDOSTextLineBreaks
+                    ///wdFormatEncodedText
+                    ///wdFormatRTF
+                    ///wdFormatTemplate
+                    ///wdFormatText
+                    ///wdFormatTextLineBreaks
+                    ///wdFormatUnicodeText
+            //-----------------------------------------------------------------------------------
+            //            docType.InvokeMember( "SaveAs", System.Reflection.BindingFlags.InvokeMethod,
+            //                null, WordDoc, new object[]{saveFileName, Word.WdSaveFormat.wdFormatHTML} );
+            // 退出 Word
+            //wordType.InvokeMember( "Quit", System.Reflection.BindingFlags.InvokeMethod,
+            //    null, WordApp, null );
+            #endregion
+            WordDoc.Close(ref oMissing, ref oMissing, ref oMissing);
+            WordApp.Quit(ref oMissing, ref oMissing, ref oMissing);
+        }
+#endregion
     }
 }

@@ -42,8 +42,8 @@ namespace TestPaperCreator.Controllers.TestPaperService
             }
             BLL.Utility.OpenXmlForOffice.SplitDocx(localPath, name, question);
             //清除问题内容中的问号
-            BLL.TestPaperService.TestPaperService.ClearQuestionMark("?");
-            BLL.TestPaperService.TestPaperService.ClearQuestionMark(" ");
+            //BLL.TestPaperService.TestPaperService.ClearQuestionMark("?");
+            //BLL.TestPaperService.TestPaperService.ClearQuestionMark(" ");
             return Json(new
             {
                 jsonrpc = "2.0",
