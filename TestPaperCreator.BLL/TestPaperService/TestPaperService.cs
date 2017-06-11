@@ -62,18 +62,22 @@ namespace TestPaperCreator.BLL.TestPaperService
             {
                 foreach (int tihao in questions.Keys)
                 {
+                    
                     MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
                     string course = question.Course.ToString();
                     string section = question.Section.ToString();
                     string questiontype = question.Type.ToString();
                     string difficulty = question.Difficulty.ToString();
-                    string filepath = rootpath + @"\Upload\" + course + @"\" + section + @"\" + questiontype + @"\" + difficulty + @"\" + questions[tihao].ToString() + ".docx";
-                    if (!Directory.Exists(rootpath + @"\Upload\OUT\" + datitihao.ToString()))
+                    if(questiontype == type[datitihao].Type.ToString())
                     {
-                        Directory.CreateDirectory(rootpath + @"\Upload\OUT\" + datitihao.ToString());
+                        string filepath = rootpath + @"\Upload\" + course + @"\" + section + @"\" + questiontype + @"\" + difficulty + @"\" + questions[tihao].ToString() + ".docx";
+                        if (!Directory.Exists(rootpath + @"\Upload\OUT\" + datitihao.ToString()))
+                        {
+                            Directory.CreateDirectory(rootpath + @"\Upload\OUT\" + datitihao.ToString());
+                        }
+                        string distpath = rootpath + @"\Upload\OUT\" + datitihao.ToString() + @"\" + tihao.ToString() + ".docx";
+                        File.Copy(filepath, distpath, true);
                     }
-                    string distpath = rootpath + @"\Upload\OUT\" + datitihao.ToString() + @"\" + tihao.ToString() + ".docx";
-                    File.Copy(filepath, distpath, true);
                 }
             }
         }

@@ -163,9 +163,10 @@ namespace TestPaperCreator.DAL.TestPaperService
         {
             //试卷字典，key代表题型ID，value代表
             IDictionary<int, List<int>> paperDic = new Dictionary<int, List<int>>();
-            List<int> b = new List<int>();
+            
             foreach (MODEL.TestPaper.Paper paper in paperlist)
             {
+                List<int> b = new List<int>();
                 int course = paper.paperproperty.course;
                 int section = paper.paperproperty.section;
                 int difficulty = paper.paperproperty.difficulty;
@@ -193,7 +194,8 @@ namespace TestPaperCreator.DAL.TestPaperService
                     c.Add(r);
                     i++;
                 }
-                paperDic[questiontype] = b;
+                paperDic.Add(questiontype, b);
+                //paperDic[questiontype] = b;
             }
             return paperDic;
         }

@@ -202,7 +202,7 @@ namespace TestPaperCreator.BLL.Utility
                         flag++;
                         try
                         {
-                            OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + ".docx",file+maxid.ToString()+".html");
+                            OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + ".docx");
                         }
                         catch (Exception e)
                         {
@@ -233,7 +233,7 @@ namespace TestPaperCreator.BLL.Utility
                     {
                         documentisend = true;
                         flag++;
-                        OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + "_answer.docx",file+maxid.ToString()+"_answer.html");
+                        OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + "_answer.docx");
                         maxid++;
                         continue;
                     }
@@ -275,14 +275,6 @@ namespace TestPaperCreator.BLL.Utility
                 WordprocessingDocument datiobj = WordprocessingDocument.Open(dati, true);
                 foreach (OpenXmlElement oxe in datiobj.MainDocumentPart.Document.Body.ChildElements)
                 {
-                    foreach (OpenXmlElement b in oxe.Descendants<BookmarkStart>())
-                    {
-                        b.Remove();
-                    }
-                    foreach (OpenXmlElement b in oxe.Descendants<BookmarkEnd>())
-                    {
-                        b.Remove();
-                    }
                     //Paragraph refparagraph = paperbodyobj.MainDocumentPart.RootElement.Descendants<Paragraph>().Last();
                     foreach (EmbeddedObject embedobj in oxe.Descendants<EmbeddedObject>())
                     {
@@ -304,6 +296,8 @@ namespace TestPaperCreator.BLL.Utility
                 }
                 datiobj.Close();
             }
+            paperheadobj.MainDocumentPart.Document.Body.RemoveAllChildren<BookmarkStart>();
+            paperheadobj.MainDocumentPart.Document.Body.RemoveAllChildren<BookmarkEnd>();
             paperheadobj.Close();
         }
         #endregion
@@ -359,17 +353,29 @@ namespace TestPaperCreator.BLL.Utility
                 int score = type[tihao].Score;
                 int total_count = count * score;
                 //获取题型中文名
-                string tixingmingzi = "选择题";
+                string tixingmingzi = DAL.TestPaperService.TestPaperService.GetConditionNameByConditionID(tixing,"Type");
                 string[] xiaotifiles = Directory.GetFiles(copyfiles + @"\" + tihao.ToString());
+                List<int> xiaotiIDlist = new List<int>();
+                string xiaotipath = System.IO.Path.GetDirectoryName(xiaotifiles[0]);
+                foreach (string file in xiaotifiles)
+                {
+                    xiaotiIDlist.Add(Convert.ToInt32(System.IO.Path.GetFileNameWithoutExtension(file)));
+                }
+                xiaotiIDlist.Sort();
+                List<string> newxiaotifiles = new List<string>();
+                foreach(int i in xiaotiIDlist)
+                {
+                    newxiaotifiles.Add(xiaotipath + @"\" + i.ToString() + ".docx");
+                }
                 //WordprocessingDocument paperbodyobj = WordprocessingDocument.Open(paperbody_copy, true);
 
-                eic = InsertXiaoTi(tixing, count, score, total_count, tixingmingzi, tihao, xiaotifiles, paperbody_copy, eic);
+                eic = InsertXiaoTi(tixing, count, score, total_count, tixingmingzi, tihao, newxiaotifiles, paperbody_copy, eic);
             }
         }
         #endregion
 
         #region 插入小题
-        public static MODEL.TestPaper.EmbedIDCounter InsertXiaoTi(int tixing, int count, int score, int total_count, string tixingmingzi, int tihao, string[] xiaotifiles, string paperbody_copy, MODEL.TestPaper.EmbedIDCounter eic)
+        public static MODEL.TestPaper.EmbedIDCounter InsertXiaoTi(int tixing, int count, int score, int total_count, string tixingmingzi, int tihao, List<string> xiaotifiles, string paperbody_copy, MODEL.TestPaper.EmbedIDCounter eic)
         {
             int maxrid = eic.MaxrId;
             int maxshapeid = eic.MaxshapeId;
@@ -396,9 +402,10 @@ namespace TestPaperCreator.BLL.Utility
                 WordprocessingDocument xiaotiobj = WordprocessingDocument.Open(file, false);
                 List<Paragraph> xiaotiparagraphlist = xiaotiobj.MainDocumentPart.RootElement.Descendants<Paragraph>().ToList();
                 //加入题号
-                
-                string number = System.IO.Path.GetFileName(file).Replace("*",".docx");
-                number = number.Split('*')[0];
+                string number = System.IO.Path.GetFileNameWithoutExtension(file);
+                //string number = System.IO.Path.GetFileName(file);
+                //number = number.Replace("*", ".docx");
+                //number = number.Split('*')[0];
                 Run run1 = new Run();
                 RunProperties runProperties1 = new RunProperties();
                 RunFonts runFonts1 = new RunFonts() { Hint = FontTypeHintValues.EastAsia, Ascii = "宋体", HighAnsi = "宋体" };
