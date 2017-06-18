@@ -105,7 +105,7 @@ namespace TestPaperCreator.BLL.Utility
         /// <param name="filepath">文档路径</param>
         /// <param name="paragraph">待插入的段落</param>
         /// <param name="wordprocessingDocument">源文件对象</param>
-        private static void OpenAndAddParagraphToWordDocument(string filepath, Paragraph paragraph, WordprocessingDocument wordprocessingDocument)
+        private static void OpenAndAddParagraphToWordDocument(string filepath, Paragraph paragraph, WordprocessingDocument wordprocessingDocument,List<string> objridlist,List<string> imgridlist)
         {
             //打开目标文件
             WordprocessingDocument distwordprocessingDocument = WordprocessingDocument.Open(filepath, true);
@@ -113,17 +113,25 @@ namespace TestPaperCreator.BLL.Utility
             foreach (DocumentFormat.OpenXml.Vml.Office.OleObject obj in paragraph.Descendants<DocumentFormat.OpenXml.Vml.Office.OleObject>().ToList())
             {
                 string rid = GetEmbedObjectID(obj);
-                IdPartPair ip = wordprocessingDocument.MainDocumentPart.Parts.Single(p => p.RelationshipId == rid);
-                distwordprocessingDocument.MainDocumentPart.AddPart(ip.OpenXmlPart, rid);
-
+                
+                if(!objridlist.Contains(rid))
+                {
+                    IdPartPair ip = wordprocessingDocument.MainDocumentPart.Parts.Single(p => p.RelationshipId == rid);
+                    distwordprocessingDocument.MainDocumentPart.AddPart(ip.OpenXmlPart, rid);
+                }
+                objridlist.Add(rid);
             }
             //遍历图片内容
             foreach (ImageData imagedata in paragraph.Descendants<ImageData>())
             {
                 string rid = GetImageID(imagedata);
-                IdPartPair ip = wordprocessingDocument.MainDocumentPart.Parts.Single(p => p.RelationshipId == rid);
-                distwordprocessingDocument.MainDocumentPart.AddPart(ip.OpenXmlPart, rid);
-
+                
+                if(!imgridlist.Contains(rid))
+                {
+                    IdPartPair ip = wordprocessingDocument.MainDocumentPart.Parts.Single(p => p.RelationshipId == rid);
+                    distwordprocessingDocument.MainDocumentPart.AddPart(ip.OpenXmlPart, rid);
+                }
+                imgridlist.Add(rid);
             }
             //摄氏度后面的字符跟的太近了，所以遇到摄氏度的时候就要增加两个空格调远一点
             foreach (Run r in paragraph.Descendants<Run>())
@@ -187,6 +195,8 @@ namespace TestPaperCreator.BLL.Utility
             bool documentisend = true;//标记一个文档是否插入完成
             maxid += 1;//从最大ID+1开始新增题目
             StringBuilder sb = new StringBuilder();//内容容器
+            List<string> imgridlist = new List<string>();
+            List<string> objridlist = new List<string>();
             foreach (Paragraph p in body.Descendants<Paragraph>().ToList())
             {
                 if (flag % 2 == 0)
@@ -198,6 +208,8 @@ namespace TestPaperCreator.BLL.Utility
                     }
                     if (p.InnerText == "@")
                     {
+                        imgridlist = new List<string>();
+                        objridlist = new List<string>();
                         documentisend = true;
                         flag++;
                         try
@@ -212,7 +224,7 @@ namespace TestPaperCreator.BLL.Utility
                         sb.Length = 0;//清空stringbuilder
                         continue;
                     }
-                    OpenAndAddParagraphToWordDocument(file + maxid.ToString() + ".docx", p, wordprocessingDocument);
+                    OpenAndAddParagraphToWordDocument(file + maxid.ToString() + ".docx", p, wordprocessingDocument,objridlist,imgridlist);
                     sb.Append(p.InnerText);
                 }
                 else
@@ -231,13 +243,15 @@ namespace TestPaperCreator.BLL.Utility
                     }
                     if (p.InnerText == "@")
                     {
+                        imgridlist = new List<string>();
+                        objridlist = new List<string>();
                         documentisend = true;
                         flag++;
                         OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + "_answer.docx");
                         maxid++;
                         continue;
                     }
-                    OpenAndAddParagraphToWordDocument(file + maxid.ToString() + "_answer.docx", p, wordprocessingDocument);
+                    OpenAndAddParagraphToWordDocument(file + maxid.ToString() + "_answer.docx", p, wordprocessingDocument,objridlist,imgridlist);
                 }
             }
             wordprocessingDocument.Close();
@@ -252,7 +266,7 @@ namespace TestPaperCreator.BLL.Utility
         #endregion
 
         #region 将大题合并到试卷
-        public static void MergeDatiToPaper(string paperhead, string strCopyFolder)
+        public static void MergeDatiToPaper(string paperhead, string strCopyFolder, MODEL.TestPaper.PaperProperty paperproperty)
         {
             string name = Guid.NewGuid().ToString();
             #region 复制大题模板并转换为docx格式
@@ -296,12 +310,104 @@ namespace TestPaperCreator.BLL.Utility
                 }
                 datiobj.Close();
             }
+            BookmarkStart schoolname = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "SchoolName");
+            InsertRunToBookMark(schoolname, paperproperty.schoolname,1);
+            //schoolname.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.schoolname;
+            BookmarkStart collegename = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "CollegeName");
+            InsertRunToBookMark(collegename, paperproperty.collegename,1);
+            //collegename.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.collegename;
+            BookmarkStart majorname = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "MajorName");
+            InsertRunToBookMark(majorname, paperproperty.majorname,1);
+            //majorname.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.majorname;
+            BookmarkStart term = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "Term");
+            InsertRunToBookMark(term, paperproperty.term,1);
+            //term.NextSibling<Run>().Descendants<Text>().First() = paperproperty.term;
+            BookmarkStart testtype = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "TestType");
+            InsertRunToBookMark(testtype, paperproperty.testtype,1);
+            //testtype.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.testtype;
+            BookmarkStart course = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "CourseName");
+            InsertRunToBookMark(course, paperproperty.course,2);
+            //course.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.course;
+            BookmarkStart volume = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "Volume");
+            InsertRunToBookMark(volume, paperproperty.volume,2);
+            //volume.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.volume;
+            BookmarkStart length = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "Length");
+            InsertRunToBookMark(length, paperproperty.length,0);
+            //length.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.length;
+            BookmarkStart testmethod = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "TestMethod");
+            InsertRunToBookMark(testmethod, paperproperty.testmethod,0);
+            //testmethod.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.testmethod;
+            BookmarkStart schoolyear = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "SchoolYear");
+            InsertRunToBookMark(schoolyear, paperproperty.schoolyear,1);
+            //schoolyear.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.schoolyear;
+            BookmarkStart grade = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "Grade");
+            InsertRunToBookMark(grade, paperproperty.grade,0);
+            //grade.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.grade;
+            BookmarkStart classnumber = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "Class");
+            InsertRunToBookMark(classnumber, paperproperty.classnumber,0);
+            //classnumber.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.classnumber;
+            BookmarkStart typecount = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "TypeCount");
+            InsertRunToBookMark(typecount, paperproperty.total_count,0);
+            //typecount.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.total_count;
+            BookmarkStart totalscore = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Where(i => i.Name == "TotalScore").First();
+            InsertRunToBookMark(totalscore, paperproperty.total_score,0);
             paperheadobj.MainDocumentPart.Document.Body.RemoveAllChildren<BookmarkStart>();
             paperheadobj.MainDocumentPart.Document.Body.RemoveAllChildren<BookmarkEnd>();
             paperheadobj.Close();
         }
         #endregion
+        public static void InsertRunToBookMark(BookmarkStart bms,string content,int flag)
+        {
+            if(flag == 1)
+            {
+                Run run1 = new Run();
 
+                RunProperties runProperties1 = new RunProperties();
+                RunFonts runFonts1 = new RunFonts() { Hint = FontTypeHintValues.EastAsia, EastAsia = "黑体" };
+                FontSize fontSize1 = new FontSize() { Val = "28" };
+                FontSizeComplexScript fontSizeComplexScript1 = new FontSizeComplexScript() { Val = "28" };
+
+                runProperties1.Append(runFonts1);
+                runProperties1.Append(fontSize1);
+                runProperties1.Append(fontSizeComplexScript1);
+                Text text1 = new Text();
+                text1.Text = content;
+
+                run1.Append(runProperties1.CloneNode(true));
+                run1.Append(text1.CloneNode(true));
+                bms.Parent.InsertAfter(run1, bms);
+            }
+            if(flag == 2)
+            {
+                Run run1 = new Run();
+
+                RunProperties runProperties1 = new RunProperties();
+                RunFonts runFonts1 = new RunFonts() { HighAnsi = "宋体" };
+                Bold bold1 = new Bold();
+                FontSize fontSize1 = new FontSize() { Val = "36" };
+                FontSizeComplexScript fontSizeComplexScript1 = new FontSizeComplexScript() { Val = "36" };
+
+                runProperties1.Append(runFonts1);
+                runProperties1.Append(bold1);
+                runProperties1.Append(fontSize1);
+                runProperties1.Append(fontSizeComplexScript1);
+                Text text1 = new Text() { Space = SpaceProcessingModeValues.Preserve };
+                text1.Text = content;
+
+                run1.Append(runProperties1.CloneNode(true));
+                run1.Append(text1.CloneNode(true));
+                bms.Parent.InsertAfter(run1, bms);
+            }
+            if(flag == 0)
+            {
+                Run run1 = new Run();
+                Text text1 = new Text();
+                text1.Text = content;
+                run1.Append(text1.CloneNode(true));
+                bms.Parent.InsertAfter(run1, bms);
+
+            }
+        }
         #region 插入大题
         public static void InsertDaTi(string paperhead, string paperbody, string copyfiles, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
         {
@@ -411,7 +517,7 @@ namespace TestPaperCreator.BLL.Utility
                 RunFonts runFonts1 = new RunFonts() { Hint = FontTypeHintValues.EastAsia, Ascii = "宋体", HighAnsi = "宋体" };
                 runProperties1.Append(runFonts1);
                 Text text1 = new Text();
-                text1.Text = number+". ";
+                text1.Text = number+"、";
                 run1.Append(runProperties1);
                 run1.Append(text1);
                 xiaotiobj.MainDocumentPart.RootElement.Descendants<Paragraph>().First().InsertBefore(run1, xiaotiobj.MainDocumentPart.RootElement.Descendants<Paragraph>().First().ChildElements.First<Run>());
@@ -496,12 +602,12 @@ namespace TestPaperCreator.BLL.Utility
         /// <param name="outfile">输出文档</param>
         /// <param name="strCopyFolder">待插入题的文件夹</param>
         /// <param name="type">大题字典，key为题号，value为题型</param>
-        public static void CreatePaper(string paperhead, string paperbody, string strCopyFolder, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
+        public static void CreatePaper(string paperhead, string paperbody, string strCopyFolder, Dictionary<int, MODEL.TestPaper.SingleDaTi> type,MODEL.TestPaper.PaperProperty paperproperty)
         {
             //将小题组合成大题，按题号命名，放在OUT文件夹内
             InsertDaTi(paperhead, paperbody, strCopyFolder, type);
             //将大题合并成试卷
-            MergeDatiToPaper(paperhead, strCopyFolder);
+            MergeDatiToPaper(paperhead, strCopyFolder, paperproperty);
         }
         #endregion
 

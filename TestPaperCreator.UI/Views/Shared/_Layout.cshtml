@@ -32,32 +32,32 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a href="/Home/Index" class="navbar-brand">试卷生成器</a>
+                <a href="/Home/Index" class="navbar-brand"><strong>试卷生成器</strong></a>
 
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("主页", "Index", "Home", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("上传试卷", "Index", "UploadQuestions", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("下载试卷", "Index", "DownloadTestPaper", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("管理试题", "Index", "ViewQuestion", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("系统管理", "Index", "Manage", new { area = "" }, null)</li>
+                    <li><a href="/Home/Index"><strong>主页</strong></a></li>
+                    <li><a href="/UploadQuestions/Index"><strong>上传试卷</strong></a></li>
+                    <li><a href="/DownloadTestPaper/Index"><strong>生成试卷</strong></a></li>
+                    <li><a href="/ViewQuestion/Index"><strong>管理试题</strong></a></li>
+                    <li><a href="/Manage/Index"><strong>系统管理</strong></a></li>
                 </ul>
                 <ul class="nav navbar-nav" style="float:right">
                     @if (ViewBag.IsLogin == true)
                     {
                         <li>
-                            <a class="pull-right" href="#">您好，@ViewBag.Username</a>
+                            <a class="pull-right" href="#"><strong>您好，@ViewBag.Username</strong></a>
 
                         </li>
                         <li>
-                            <a class="pull-right" href="@Url.Action("Index", "Home")"><span class="glyphicon glyphicon-home"></span></a>
+                            <a class="pull-right" href="@Url.Action("Index", "Home")"><strong><span class="glyphicon glyphicon-home"></span></strong></a>
                         </li>
                         <li>
-                            <a class="pull-right" href="@Url.Action("Index", "Home")"><span class="glyphicon glyphicon-cog"></span></a>
+                            <a class="pull-right" href="@Url.Action("Index", "Home")"><strong><span class="glyphicon glyphicon-cog"></span></strong></a>
                         </li>
                         <li>
-                            @Html.ActionLink("退出", "Logout", "Membership", new { area = "" }, new { @class = "pull-right" })
+                            <a href="Membership/Logout" class="pull-right"><strong>退出</strong></a>
                         </li>
                     }
                     else
@@ -85,3 +85,8 @@
 
 </body>
 </html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#username").focus()
+    })
+</script>

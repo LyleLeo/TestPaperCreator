@@ -159,20 +159,19 @@
                 </select>
             </div>
             <div class="col-lg-2 form-group">
-                数量：<input id="questioncount" onfocus="this.select()" placeholder="请填写数量" class="form-control" type="text" />
+                数量：<input id="questioncount" onkeyup="Calculate()" onfocus="this.select()" placeholder="请填写数量" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                每题分值：<input id="score" onfocus="this.select()" placeholder="请填写分值" class="form-control" type="text" />
+                每题分值：<input id="score" onkeyup="Calculate()" onfocus="this.select()" placeholder="请填写分值" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                总分：<input id="totalscore" onfocus="this.select()" placeholder="请填写分值" class="form-control" type="text" />
+                总分：<input id="totalscore" class="form-control" disabled="disabled" type="text" />
             </div>
             <div class="col-lg-1 form-group">
                 &nbsp<button id="AddOn" onclick="Add()" class="btn btn-primary form-control" type="button">添加</button>
             </div>
         </div>
         <div id="warning" class="alert alert-warning" hidden="hidden"></div>
-        <div><span style="color:red">注：若要为每道题单独设置分值，则要列举出该题型下所有题的分值，以英文逗号隔开，例如问答题数量为3，则每题分值为20,20,30</span></div>
         <table id="basic_table" class="table">
             <thead>
                 <tr>
@@ -201,12 +200,30 @@
         var schoolyear = $("#final_schoolyear").val()
         var term = $("#final_term").val()
         var testtype = $("#final_testtype").val()
-        var course = $("#final_course").val()
+        var course = $("#final_course").find("option:selected").text()
         var volume = $("#final_volume").val()
         var length = $("#final_length").val()
         var testmethod = $("#final_testmethod").val()
         var grade = $("#final_grade").val()
         var classnumber = $("#final_class").val()
+        var total_count = $("#total_count").text().split("：")[1]
+        var total_score = $("#total_score").text().split("：")[1]
+        var property = {
+                schoolname: schoolname,
+                collegename: collegename,
+                majorname: majorname,
+                schoolyear: schoolyear,
+                term: term,
+                testtype: testtype,
+                course: course,
+                volume: volume,
+                length: length,
+                testmethod: testmethod,
+                grade: grade,
+                classnumber: classnumber,
+                total_count: total_count,
+                total_score:total_score
+        }
         var tihao = 1
         var typelist = []
         $.each($("#Content").children("tr"), function (idx, obj) {
@@ -235,9 +252,12 @@
             url: "/api/DownloadTestPaperAPI/Generate/",
             type: "POST",
             contentType: 'application/json',
-            data: JSON.stringify({ questionlist: questionlist, typelist: typelist }),
+            data: JSON.stringify({ questionlist: questionlist, typelist: typelist, property: property }),
             beforeSend: function () {
-
+                $.ajax({
+                    url: "/api/DownloadTestPaperAPI/DeleteTemp/",
+                    type: "POST",
+                })
             },
             success: function (result) {
                 alert("生成成功")
@@ -633,7 +653,7 @@
                 $("#testpaper").show()
                 var width = parseInt($("#testpapertable").find("th").first().innerWidth())-4
                 $.each(result, function (index, obj) {
-                    html += '<tr><td colspan="4"><iframe width="' + width + '" id=' + obj.ID + ' src="' + localhostPath + '/Upload/' + obj.Course + '/' + obj.Section + '/' + obj.Type + '/' + obj.Difficulty + '/files/' + obj.ID + '.html"></iframe></td><td rowspan="2" style="text-align:center;vertical-align:middle"><button class="btn btn-primary" onclick="ChangeIt(this)">换题</button></td></tr><tr><td id="'+obj.Course+'">课程名称：' + obj.CourseName + '</td><td id="'+obj.Section+'">章节名称：' + obj.SectionName + '</td><td id="'+obj.Type+'">题型：' + obj.TypeName + '</td><td id="'+obj.Difficulty+'">难度：' + obj.DifficultyName + '</td></tr>'
+                    html += '<tr><td colspan="4"><iframe width="' + width + '" id=' + obj.ID + ' src="' + localhostPath + '/Upload/' + obj.Course + '/' + obj.Section + '/' + obj.Type + '/' + obj.Difficulty + '/files/' + obj.ID + '.html'+'?new='+Math.random()+'"></iframe></td><td rowspan="2" style="text-align:center;vertical-align:middle"><button class="btn btn-primary" onclick="ChangeIt(this)">换题</button></td></tr><tr><td id="'+obj.Course+'">课程名称：' + obj.CourseName + '</td><td id="'+obj.Section+'">章节名称：' + obj.SectionName + '</td><td id="'+obj.Type+'">题型：' + obj.TypeName + '</td><td id="'+obj.Difficulty+'">难度：' + obj.DifficultyName + '</td></tr>'
                 })
                 $("#testpapertable").children("tbody").eq(0).html(html)
                 $("#final").hide()
@@ -706,10 +726,18 @@
                 var pos = curWwwPath.indexOf(pathName);
                 var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
                 var html = ""
-                $(obj).parent().prev().children("iframe").eq(0).attr("src", localhostPath + '/Upload/' + result.Course + '/' + result.Section + '/' + result.Type + '/' + result.Difficulty + '/files/' + result.ID + '.html')
+                $(obj).parent().prev().children("iframe").eq(0).attr("src", localhostPath + '/Upload/' + result.Course + '/' + result.Section + '/' + result.Type + '/' + result.Difficulty + '/files/' + result.ID + '.html' + '?new=' + Math.random())
                 //window.open(localhostPath + "/Upload/Output/out.docx")
                 $(obj).parent().prev().children("iframe").eq(0).attr("id",result.ID)
             }
         })
+    }
+
+    function Calculate()
+    {
+        if($("#questioncount").val() != "" &&$("#score").val()!="")
+        {
+            $("#totalscore").val(parseInt($("#questioncount").val()) * parseInt($("#score").val()))
+        }
     }
 </script>

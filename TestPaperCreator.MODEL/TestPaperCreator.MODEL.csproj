@@ -44,6 +44,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestPaper\Condition.cs" />
     <Compile Include="TestPaper\Paper.cs" />
+    <Compile Include="TestPaper\PaperProperty.cs" />
     <Compile Include="TestPaper\Question.cs" />
     <Compile Include="TestPaper\Type.cs" />
     <Compile Include="Utility\Result.cs" />
