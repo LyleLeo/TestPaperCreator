@@ -24,7 +24,6 @@ namespace TestPaperCreator.Controllers.TestPaperService
                 return Json(new { jsonrpc = 2.0, error = new { code = 102, message = "保存失败" }, id = "id" });
             }
             string ex = Path.GetExtension(file.FileName);
-            //filePathName = Guid.NewGuid().ToString("N") + ex;
             if (!Directory.Exists(localPath))
             {
                 Directory.CreateDirectory(localPath);

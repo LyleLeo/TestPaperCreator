@@ -349,6 +349,7 @@ namespace TestPaperCreator.BLL.Utility
             BookmarkStart typecount = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Single(i => i.Name == "TypeCount");
             InsertRunToBookMark(typecount, paperproperty.total_count,0);
             //typecount.NextSibling<Run>().Descendants<Text>().First().Text = paperproperty.total_count;
+            List<BookmarkStart> bmslist = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Where(i => i.Name == "TotalScore").ToList();
             BookmarkStart totalscore = paperheadobj.MainDocumentPart.RootElement.Descendants<BookmarkStart>().Where(i => i.Name == "TotalScore").First();
             InsertRunToBookMark(totalscore, paperproperty.total_score,0);
             paperheadobj.MainDocumentPart.Document.Body.RemoveAllChildren<BookmarkStart>();
@@ -356,6 +357,14 @@ namespace TestPaperCreator.BLL.Utility
             paperheadobj.Close();
         }
         #endregion
+
+        #region 插入连续文字到书签
+        /// <summary>
+        /// 插入连续文字到书签
+        /// </summary>
+        /// <param name="bms">书签起始对象</param>
+        /// <param name="content">插入内容</param>
+        /// <param name="flag">标记</param>
         public static void InsertRunToBookMark(BookmarkStart bms,string content,int flag)
         {
             if(flag == 1)
@@ -380,13 +389,11 @@ namespace TestPaperCreator.BLL.Utility
             if(flag == 2)
             {
                 Run run1 = new Run();
-
                 RunProperties runProperties1 = new RunProperties();
                 RunFonts runFonts1 = new RunFonts() { HighAnsi = "宋体" };
                 Bold bold1 = new Bold();
                 FontSize fontSize1 = new FontSize() { Val = "36" };
                 FontSizeComplexScript fontSizeComplexScript1 = new FontSizeComplexScript() { Val = "36" };
-
                 runProperties1.Append(runFonts1);
                 runProperties1.Append(bold1);
                 runProperties1.Append(fontSize1);
@@ -408,6 +415,8 @@ namespace TestPaperCreator.BLL.Utility
 
             }
         }
+        #endregion
+
         #region 插入大题
         public static void InsertDaTi(string paperhead, string paperbody, string copyfiles, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
         {

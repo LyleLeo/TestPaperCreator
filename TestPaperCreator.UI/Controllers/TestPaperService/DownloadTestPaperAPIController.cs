@@ -25,14 +25,9 @@ namespace TestPaperCreator.Controllers.TestPaperService
             {
                 int i = Convert.ToInt32(item.ToString());
                 oldidlist.Add(i);
-                //oldidlist.Add(item.Value(int))
             }
 
             int oldquestionid = Convert.ToInt32(obj.oldquestionid);
-            //MODEL.TestPaper.Paper paper = new MODEL.TestPaper.Paper();
-            //MODEL.TestPaper.Property property = new MODEL.TestPaper.Property();
-            //property = Newtonsoft.Json.JsonConvert.DeserializeObject<MODEL.TestPaper.Property>(Convert.ToString(obj.paper.Property));
-            //paper.count = Newtonsoft.Json.JsonConvert.DeserializeObject<MODEL.TestPaper.Paper>(Convert.ToString(obj.paper.count));
             MODEL.TestPaper.Paper paper = Newtonsoft.Json.JsonConvert.DeserializeObject<MODEL.TestPaper.Paper>(Convert.ToString(obj.paper));
             return BLL.TestPaperService.TestPaperService.GetOneQuestion(paper, oldidlist);
         }
