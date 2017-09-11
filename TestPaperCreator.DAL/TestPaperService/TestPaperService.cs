@@ -14,6 +14,27 @@ namespace TestPaperCreator.DAL.TestPaperService
         private static string conn = Conn.GetSqlServerConn("ALiConnection");
         #endregion
 
+        #region 查询专业列表
+        /// <summary>
+        /// 查询专业列表
+        /// </summary>
+        /// <returns>专业列表</returns>
+        public static List<MODEL.TestPaper.Condition> GetMajor()
+        {
+            List<MODEL.TestPaper.Condition> majorlist = new List<MODEL.TestPaper.Condition>();
+            string sql = "select id, Value from Major where Flag = 1";
+            DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+            foreach(DataRow dr in ds.Tables[0].Rows)
+            {
+                MODEL.TestPaper.Condition major = new MODEL.TestPaper.Condition();
+                major.id = (int)dr[0];
+                major.value = (string)dr[1];
+                majorlist.Add(major);
+            }
+            return majorlist;
+        }
+        #endregion
+
         #region 增删改筛选条件
         /// <summary>
         /// 增删筛选条件
