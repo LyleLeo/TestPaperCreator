@@ -621,6 +621,7 @@
 
     function Create() {
         var paperlist = []
+        var majorid = $("#final_majorname option:selected").val()
         $("#final").find("tbody").each(function () {
             var paper = {}
             $.each($(this).children("tr"), function (index, obj) {
@@ -629,12 +630,14 @@
                 var sectionid = $(obj).children("td").eq(2).children("span").eq(0).text()
                 var difficultyid = $(obj).children("td").eq(3).children("span").eq(0).text()
                 var count = $(obj).children("td").eq(4).children("span").eq(0).text()
+                
                 paper = {
                     paperproperty: {
                         course: courseid,
                         questiontype: questiontypeid,
                         section: sectionid,
-                        difficulty: difficultyid
+                        difficulty: difficultyid,
+                        major:majorid
                     },
                     count: count
                 }
