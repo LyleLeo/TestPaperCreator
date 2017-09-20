@@ -102,22 +102,22 @@
     <div class="panel-body">
         <div class="row" style="color:black">
             <div class="col-lg-2 form-group">
-                学校名称：<input id="schoolname" placeholder="例：四川师范大学" class="form-control" type="text" />
+                学校名称：<input id="schoolname" placeholder="例：四川师范大学" class="form-control" type="text" value="@ViewBag.Property["schoolname"]" />
             </div>
             <div class="col-lg-2 form-group">
-                学院名称：<input id="collegename" placeholder="例：计算机科学学院" class="form-control" type="text" />
+                学院名称：<input id="collegename" placeholder="例：计算机科学学院" class="form-control" type="text" value="@ViewBag.Property["collegename"]" />
             </div>
             <div class="col-lg-2 form-group">
                 专业名称：<input id="majorname" placeholder="例：化学、软件工程" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
-                学年：<input id="schoolyear" placeholder="例：2014-2015" class="form-control" type="text" />
+                学年：<input id="schoolyear" placeholder="例：2014-2015" class="form-control" type="text" value="@ViewBag.Property["schoolyear"]" />
             </div>
             <div class="col-lg-2 form-group">
-                学期：<input id="term" placeholder="例：1、2" class="form-control" type="text" />
+                学期：<input id="term" placeholder="例：1、2" class="form-control" type="text" value="@ViewBag.Property["term"]" />
             </div>
             <div class="col-lg-2 form-group">
-                考试类型：<input id="testtype" placeholder="例：期中、期末" class="form-control" type="text" />
+                考试类型：<input id="testtype" placeholder="例：期中、期末" class="form-control" type="text" value="@ViewBag.Property["testtype"]" />
             </div>
         </div>
         <div class="row" style="color:black">
@@ -132,19 +132,19 @@
 
             </div>
             <div class="col-lg-2 form-group">
-                分卷：<input id="volume" placeholder="例：A、B" class="form-control" type="text" />
+                分卷：<input id="volume" placeholder="例：A、B" class="form-control" type="text" value="@ViewBag.Property["volume"]" />
             </div>
             <div class="col-lg-2 form-group">
-                考试时长(分钟)：<input id="length" placeholder="例：120、90" class="form-control" type="text" />
+                考试时长(分钟)：<input id="length" placeholder="例：120、90" class="form-control" type="text" value="@ViewBag.Property["length"]" />
             </div>
             <div class="col-lg-2 form-group">
-                考查方式：<input id="testmethod" placeholder="例：开卷、闭卷" class="form-control" type="text" />
+                考查方式：<input id="testmethod" placeholder="例：开卷、闭卷" class="form-control" type="text" value="@ViewBag.Property["testmethod"]" />
             </div>
             <div class="col-lg-2 form-group">
-                适用年级：<input id="grade" placeholder="例：2013、2014" class="form-control" type="text" />
+                适用年级：<input id="grade" placeholder="例：2013、2014" class="form-control" type="text" value="@ViewBag.Property["grade"]" />
             </div>
             <div class="col-lg-2 form-group">
-                适用班级（顿号隔开）：<input id="class" placeholder="例：1、2、3" class="form-control" type="text" />
+                适用班级（顿号隔开）：<input id="class" placeholder="例：1、2、3" class="form-control" type="text" value="@ViewBag.Property["class"]" />
             </div>
         </div>
         <div><span style="color:black">请添加试卷结构</span></div>

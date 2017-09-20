@@ -63,6 +63,7 @@ namespace TestPaperCreator.Controllers.TestPaperService
             ViewBag.DifficultyList = difficultylist;
             ViewBag.SectionList = sectionlist;
             ViewBag.QuestionTypeList = questiontype;
+            ViewBag.Property = BLL.TestPaperService.TestPaperService.GetProperty();
             return View();
         }
     }

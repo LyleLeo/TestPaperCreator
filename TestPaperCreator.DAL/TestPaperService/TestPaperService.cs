@@ -356,6 +356,29 @@ namespace TestPaperCreator.DAL.TestPaperService
             return typename == DBNull.Value ? "" : typename.ToString();
         }
         #endregion
-        
+
+        #region 自动填表
+        public static IDictionary<string,string> GetProperty()
+        {
+            Dictionary<string, string> property = new Dictionary<string, string>();
+            string sql = "select schoolname,collegename,schoolyear,term,testtype,volume,length,testmethod,grade,class from Property where id = 1";
+            DataSet result = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+            foreach(DataRow dr in result.Tables[0].Rows)
+            {
+                property["schoolname"] = dr[0].ToString();
+                property["collegename"] = dr[1].ToString();
+                property["schoolyear"] = dr[2].ToString();
+                property["term"] = dr[3].ToString();
+                property["testtype"] = dr[4].ToString();
+                property["volume"] = dr[5].ToString();
+                property["length"] = dr[6].ToString();
+                property["testmethod"] = dr[7].ToString();
+                property["grade"] = dr[8].ToString();
+                property["class"] = dr[9].ToString();
+            }
+            return property;
+        }
+        #endregion
+
     }
 }

@@ -9,6 +9,10 @@ namespace TestPaperCreator.BLL.TestPaperService
 {
     public class TestPaperService
     {
+        public static IDictionary<string,string> GetProperty()
+        {
+            return DAL.TestPaperService.TestPaperService.GetProperty();
+        }
         public static List<MODEL.TestPaper.Condition> GetCourse()
         {
             return DAL.TestPaperService.TestPaperService.GetCourse();
