@@ -50,6 +50,10 @@ namespace TestPaperCreator.BLL.TestPaperService
         {
             return DAL.TestPaperService.TestPaperService.GetOneQuestion(paper, oldidlist);
         }
+        public static List<MODEL.TestPaper.Condition> GetMajor()
+        {
+            return DAL.TestPaperService.TestPaperService.GetMajor();
+        }
         public static void CopyFiles(Dictionary<int,int> questions,string rootpath, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
         {
             if (!Directory.Exists(rootpath + @"\Upload\OUT\"))

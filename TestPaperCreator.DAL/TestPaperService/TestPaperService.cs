@@ -14,6 +14,27 @@ namespace TestPaperCreator.DAL.TestPaperService
         private static string conn = Conn.GetSqlServerConn("ALiConnection");
         #endregion
 
+        #region 查询专业列表
+        /// <summary>
+        /// 查询专业列表
+        /// </summary>
+        /// <returns>专业列表</returns>
+        public static List<MODEL.TestPaper.Condition> GetMajor()
+        {
+            List<MODEL.TestPaper.Condition> majorlist = new List<MODEL.TestPaper.Condition>();
+            string sql = "select id, Value from Major where Flag = 1";
+            DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+            foreach(DataRow dr in ds.Tables[0].Rows)
+            {
+                MODEL.TestPaper.Condition major = new MODEL.TestPaper.Condition();
+                major.id = (int)dr[0];
+                major.value = (string)dr[1];
+                majorlist.Add(major);
+            }
+            return majorlist;
+        }
+        #endregion
+
         #region 增删改筛选条件
         /// <summary>
         /// 增删筛选条件
@@ -153,6 +174,30 @@ namespace TestPaperCreator.DAL.TestPaperService
         }
         #endregion
 
+        private static List<int> GetID( List<int> avaliableID,int count,int weight,List<int> AllQuestionID, int major )
+        {
+            foreach (int i in AllQuestionID)
+            {
+                string sql = "select * from Major_Question where QuestionID = " + i + "and MajorID = " + major;
+                //sql = "insert into Major_Question (MajorID, QuestionID, Weight) values (1, " + i + ", 0)";
+                var result = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+                if (result == null)
+                {
+                    avaliableID.Add(i);
+                }
+            }
+            if(avaliableID.Count < count)
+            {
+                weight += 1;
+                return GetID(avaliableID, count, weight, AllQuestionID, major);
+            }
+            else
+            {
+                return avaliableID;
+            }
+            
+        }
+
         #region 根据条件获取试题ID集合
         /// <summary>
         /// 根据条件获取试题ID集合
@@ -171,17 +216,31 @@ namespace TestPaperCreator.DAL.TestPaperService
                 int section = paper.paperproperty.section;
                 int difficulty = paper.paperproperty.difficulty;
                 int questiontype = paper.paperproperty.questiontype;
+                int major = paper.paperproperty.major;
                 int count = paper.count;
-                string sql = "select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Weight in(select MIN(Weight) from Questions)  and Flag=1";
+                string sql = "select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Flag=1";
                 //string sql = "select ID form Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + "  and Flag=1";
                 DataSet results = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
                 //results.Tables[0].Rows
-                List<int> a = new List<int>();
+                List<int> a = new List<int>();//符合筛选条件的所有集合（未考虑权重）
                 foreach (DataRow dr in results.Tables[0].Rows)
                 {
                     a.Add((int)dr[0]);
                 }
+                List<int> avaliableID = new List<int>();//考虑权重后可选的ID集合
                 Random rd = new Random();
+                sql = "select min(Weight) from Major_Question";
+                var minweight = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+                if(minweight == DBNull.Value)
+                {
+                    minweight = 0;
+                }
+                else
+                {
+                    minweight = (int)minweight;
+                }
+                List<int> SatisfactoryID = GetID(avaliableID, paper.count, (int)minweight,a,major);
+                
                 List<int> c = new List<int>();
                 for (int i = 0; i < count;)
                 {

@@ -19,5 +19,6 @@ namespace TestPaperCreator.MODEL.TestPaper
         public int course { get; set; }
         public int section { get; set; }
         public int difficulty { get; set; }
+        public int major { get; set; }
     }
 }

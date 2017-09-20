@@ -59,11 +59,12 @@ namespace TestPaperCreator.Controllers.TestPaperService
             List<MODEL.TestPaper.Condition> difficultylist = BLL.TestPaperService.TestPaperService.GetDifficulty();
             List<MODEL.TestPaper.Condition> sectionlist = BLL.TestPaperService.TestPaperService.GetSection();
             List<MODEL.TestPaper.Condition> questiontype = BLL.TestPaperService.TestPaperService.GetQuestionType();
+            List<MODEL.TestPaper.Condition> majorlist = BLL.TestPaperService.TestPaperService.GetMajor();
             ViewBag.CourseList = courselist;
             ViewBag.DifficultyList = difficultylist;
             ViewBag.SectionList = sectionlist;
             ViewBag.QuestionTypeList = questiontype;
-            ViewBag.Property = BLL.TestPaperService.TestPaperService.GetProperty();
+            ViewBag.Majorlist = majorlist;
             return View();
         }
     }
