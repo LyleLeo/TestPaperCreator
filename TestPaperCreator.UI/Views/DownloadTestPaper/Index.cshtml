@@ -35,8 +35,8 @@
             </table>
         </div>
     </div>
-    <div class="panel-footer">
-        <button class="btn btn-default" onclick="Generate()">生成</button>
+    <div id="footer" class="panel-footer">
+        <button id="Generate" class="btn btn-default" onclick="Generate()">生成</button>
     </div>
 </div>
 
@@ -269,20 +269,31 @@
             type: "POST",
             contentType: 'application/json',
             data: JSON.stringify({ questionlist: questionlist, typelist: typelist, property: property }),
-            beforeSend: function () {
-                $.ajax({
-                    url: "/api/DownloadTestPaperAPI/DeleteTemp/",
-                    type: "POST",
-                })
-            },
             success: function (result) {
                 alert("生成成功")
                 var curWwwPath = window.document.location.href;    //获取当前url
                 var pathName = window.document.location.pathname;
                 var pos = curWwwPath.indexOf(pathName);
                 var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
-                window.open(localhostPath + "/Upload/OUT/final/" + result)
-            }
+                
+                $("#Generate").remove();
+                var html = ""
+                var date = new Date()
+                var year = date.getFullYear()
+                var month = date.getMonth() + 1
+                var day = date.getDate()
+                console.log(year)
+                console.log(month)
+                console.log(day)
+                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/"+year+month+day+"/" + result + "'>A卷</a>"
+                $("#footer").html(html);
+            },
+            complete: function () {
+                $.ajax({
+                    url: "/api/DownloadTestPaperAPI/DeleteTemp/",
+                    type: "POST",
+                })
+            },
         })
     }
     function Back(obj) {

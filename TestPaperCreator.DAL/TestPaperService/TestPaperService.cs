@@ -225,7 +225,7 @@ namespace TestPaperCreator.DAL.TestPaperService
                         {
                             avaliableID.Add(i);
                         }
-                        if( result != null && (int)result<minweight)
+                        if( result != null && (int)result < minweight)
                         {
                             avaliableID.Add(i);
                         }

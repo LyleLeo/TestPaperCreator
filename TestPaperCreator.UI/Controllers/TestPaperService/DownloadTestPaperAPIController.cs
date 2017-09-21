@@ -75,6 +75,13 @@ namespace TestPaperCreator.Controllers.TestPaperService
             string strCopyFolder = rootpath + @"\Upload\OUT\";
             BLL.Utility.OpenXmlForOffice.CreatePaper(paperhead, paperbody, strCopyFolder, type, property);
             string resultname = Path.GetFileName(Directory.GetFiles(rootpath + @"\Upload\OUT\final\")[0]);
+            string finalfile = rootpath + @"\Upload\OUT\final\" + resultname;
+            if(!Directory.Exists(rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day))
+            {
+                Directory.CreateDirectory(rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day);
+            }
+            string a = rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + @"\" + resultname;
+            File.Copy(finalfile, a, true);
             return resultname;
         }
         [HttpPost]
