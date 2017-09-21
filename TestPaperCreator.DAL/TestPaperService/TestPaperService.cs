@@ -174,29 +174,7 @@ namespace TestPaperCreator.DAL.TestPaperService
         }
         #endregion
 
-        private static List<int> GetID( List<int> avaliableID,int count,int weight,List<int> AllQuestionID, int major )
-        {
-            foreach (int i in AllQuestionID)
-            {
-                string sql = "select * from Major_Question where QuestionID = " + i + "and MajorID = " + major;
-                //sql = "insert into Major_Question (MajorID, QuestionID, Weight) values (1, " + i + ", 0)";
-                var result = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
-                if (result == null)
-                {
-                    avaliableID.Add(i);
-                }
-            }
-            if(avaliableID.Count < count)
-            {
-                weight += 1;
-                return GetID(avaliableID, count, weight, AllQuestionID, major);
-            }
-            else
-            {
-                return avaliableID;
-            }
-            
-        }
+        
 
         #region 根据条件获取试题ID集合
         /// <summary>
@@ -222,24 +200,39 @@ namespace TestPaperCreator.DAL.TestPaperService
                 //string sql = "select ID form Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + "  and Flag=1";
                 DataSet results = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
                 //results.Tables[0].Rows
-                List<int> a = new List<int>();//符合筛选条件的所有集合（未考虑权重）
+                List<int> a = new List<int>();//符合筛选条件的所有集合（已筛选课程，章节，难度，题型，未考虑权重）
                 foreach (DataRow dr in results.Tables[0].Rows)
                 {
                     a.Add((int)dr[0]);
                 }
                 List<int> avaliableID = new List<int>();//考虑权重后可选的ID集合
                 Random rd = new Random();
-                sql = "select min(Weight) from Major_Question";
-                var minweight = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
-                if(minweight == DBNull.Value)
+                sql = "select min(Weight) from Major_Question where MajorID = " + major + " and QuestionID in (select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Flag=1) ";
+                var minweightobj = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+                int minweight = 0;
+                if(minweightobj != DBNull.Value)
                 {
-                    minweight = 0;
+                    minweight = (int)minweightobj;
                 }
-                else
+                do
                 {
-                    minweight = (int)minweight;
-                }
-                List<int> SatisfactoryID = GetID(avaliableID, paper.count, (int)minweight,a,major);
+                    foreach (int i in a)
+                    {
+                        sql = "select Weight from Major_Question where QuestionID = " + i + " and MajorID = " + major;
+                        //sql = "insert into Major_Question (MajorID, QuestionID, Weight) values (1, " + i + ", 0)";
+                        var result = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+                        if (result == null)
+                        {
+                            avaliableID.Add(i);
+                        }
+                        if( result != null && (int)result<minweight)
+                        {
+                            avaliableID.Add(i);
+                        }
+                    }
+                    minweight += 1;
+                } while (avaliableID.Count< paper.count);
+                //List<int> SatisfactoryID = GetID(avaliableID, paper.count, (int)minweight,a,major);
                 
                 List<int> c = new List<int>();
                 for (int i = 0; i < count;)

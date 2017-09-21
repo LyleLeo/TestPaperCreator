@@ -210,7 +210,7 @@
     function Generate() {
         var schoolname = $("#final_schoolname").val()
         var collegename = $("#final_collegename").val()
-        var majorname = $("#final_majorname").val()
+        var majorname = $("#final_majorname").find("option:selected").text()
         var schoolyear = $("#final_schoolyear").val()
         var term = $("#final_term").val()
         var testtype = $("#final_testtype").val()
@@ -222,22 +222,7 @@
         var classnumber = $("#final_class").val()
         var total_count = $("#total_count").text().split("：")[1]
         var total_score = $("#total_score").text().split("：")[1]
-        var property = {
-            schoolname: schoolname,
-            collegename: collegename,
-            majorname: majorname,
-            schoolyear: schoolyear,
-            term: term,
-            testtype: testtype,
-            course: course,
-            volume: volume,
-            length: length,
-            testmethod: testmethod,
-            grade: grade,
-            classnumber: classnumber,
-            total_count: total_count,
-            total_score: total_score
-        }
+        
         var tihao = 1
         var typelist = []
         $.each($("#Content").children("tr"), function (idx, obj) {
@@ -252,6 +237,23 @@
             typelist.push(type)
             tihao++;
         })
+        var property = {
+            schoolname: schoolname,
+            collegename: collegename,
+            majorname: majorname,
+            schoolyear: schoolyear,
+            term: term,
+            testtype: testtype,
+            course: course,
+            volume: volume,
+            length: length,
+            testmethod: testmethod,
+            grade: grade,
+            classnumber: classnumber,
+            total_count: total_count,
+            total_score: total_score,
+            tihao: tihao
+        }
         var questionlist = []
         var xiaotitihao = 1
         $.each($("#testpapertable").children("tbody").first().find("iframe"), function (idx, obj) {
@@ -342,6 +344,8 @@
     }
 
     function Create_Details() {
+        if ($("#majorname").find("option:selected").val() == 0)
+            return
         $("#final").children("div").eq(1).children("table").remove()
         var basiclist = ["schoolname", "collegename", "majorname", "schoolyear", "term", "testtype", "course", "volume", "length", "testmethod", "grade", "class"]
         $("#basic_form").hide()

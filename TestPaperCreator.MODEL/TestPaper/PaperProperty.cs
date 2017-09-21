@@ -22,5 +22,6 @@ namespace TestPaperCreator.MODEL.TestPaper
         public string classnumber { get; set; }
         public string total_count { get; set; }
         public string total_score { get; set; }
+        public string dati_count { get; set; }
     }
 }

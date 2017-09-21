@@ -67,7 +67,7 @@ namespace TestPaperCreator.Controllers.TestPaperService
             property.schoolyear = propertyobj["schoolyear"].ToString();
             property.grade = propertyobj["grade"].ToString();
             property.classnumber = propertyobj["classnumber"].ToString();
-            property.total_count = propertyobj["total_count"].ToString();
+            property.total_count = propertyobj["tihao"].ToString();
             property.total_score = propertyobj["total_score"].ToString();
             BLL.TestPaperService.TestPaperService.CopyFiles(questions, rootpath, type);
             string paperhead = rootpath + @"\Upload\OUT\TestPaperHead.dotx";
