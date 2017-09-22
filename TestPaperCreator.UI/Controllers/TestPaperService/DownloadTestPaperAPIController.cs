@@ -33,7 +33,7 @@ namespace TestPaperCreator.Controllers.TestPaperService
         }
         [HttpPost]
         [Route("api/DownloadTestPaperAPI/Generate/")]
-        public string Generate(dynamic obj)
+        public List<string> Generate(dynamic obj)
         {
             string rootpath = HttpContext.Current.Request.MapPath("/");
             JArray questionlist = obj.questionlist;
@@ -70,19 +70,30 @@ namespace TestPaperCreator.Controllers.TestPaperService
             property.total_count = propertyobj["tihao"].ToString();
             property.total_score = propertyobj["total_score"].ToString();
             BLL.TestPaperService.TestPaperService.CopyFiles(questions, rootpath, type);
-            string paperhead = rootpath + @"\Upload\OUT\TestPaperHead.dotx";
-            string paperbody = rootpath + @"\Upload\OUT\TestPaperBody.dotx";
-            string strCopyFolder = rootpath + @"\Upload\OUT\";
-            BLL.Utility.OpenXmlForOffice.CreatePaper(paperhead, paperbody, strCopyFolder, type, property);
-            string resultname = Path.GetFileName(Directory.GetFiles(rootpath + @"\Upload\OUT\final\")[0]);
-            string finalfile = rootpath + @"\Upload\OUT\final\" + resultname;
-            if(!Directory.Exists(rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day))
+            string paperheadA = rootpath + @"\Upload\OUT\A\TestPaperHead.dotx";
+            string paperbodyA = rootpath + @"\Upload\OUT\A\TestPaperBody.dotx";
+            string paperheadB = rootpath + @"\Upload\OUT\B\TestPaperHead.dotx";
+            string paperbodyB = rootpath + @"\Upload\OUT\B\TestPaperBody.dotx";
+            string strCopyFolderA = rootpath + @"\Upload\OUT\A\";
+            string strCopyFolderB = rootpath + @"\Upload\OUT\B\";
+            BLL.Utility.OpenXmlForOffice.CreatePaper(paperheadA, paperbodyA, strCopyFolderA, type, property);
+            BLL.Utility.OpenXmlForOffice.CreatePaper(paperheadB, paperbodyB, strCopyFolderB, type, property);
+            string resultnameA = Path.GetFileName(Directory.GetFiles(rootpath + @"\Upload\OUT\A\final\")[0]);
+            string resultnameB = Path.GetFileName(Directory.GetFiles(rootpath + @"\Upload\OUT\B\final\")[0]);
+            string finalfileA = rootpath + @"\Upload\OUT\A\final\" + resultnameA;
+            string finalfileB = rootpath + @"\Upload\OUT\B\final\" + resultnameB;
+            if (!Directory.Exists(rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day))
             {
                 Directory.CreateDirectory(rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day);
             }
-            string a = rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + @"\" + resultname;
-            File.Copy(finalfile, a, true);
-            return resultname;
+            string a = rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + @"\" + resultnameA;
+            string b = rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + @"\" + resultnameB;
+            File.Copy(finalfileA, a, true);
+            File.Copy(finalfileB, b, true);
+            List<string> filelist = new List<string>();
+            filelist.Add(resultnameA);
+            filelist.Add(resultnameB);
+            return filelist;
         }
         [HttpPost]
         [Route("api/DownloadTestPaperAPI/DeleteTemp/")]

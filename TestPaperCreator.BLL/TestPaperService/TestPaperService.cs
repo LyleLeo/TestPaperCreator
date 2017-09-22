@@ -56,36 +56,62 @@ namespace TestPaperCreator.BLL.TestPaperService
         }
         public static void CopyFiles(Dictionary<int,int> questions,string rootpath, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
         {
-            if (!Directory.Exists(rootpath + @"\Upload\OUT\"))
+            if (!Directory.Exists(rootpath + @"\Upload\OUT\A\"))
             {
-                Directory.CreateDirectory(rootpath + @"\Upload\OUT\");
+                Directory.CreateDirectory(rootpath + @"\Upload\OUT\A\");
+            }
+            if (!Directory.Exists(rootpath + @"\Upload\OUT\B\"))
+            {
+                Directory.CreateDirectory(rootpath + @"\Upload\OUT\B\");
             }
             string[] templates = Directory.GetFiles(rootpath + @"\Files\", "*.dotx");
             foreach(string template in templates)
             {
                 string filename = Path.GetFileName(template);
-                File.Copy(template, rootpath+@"\Upload\OUT\"+filename, true);
+                File.Copy(template, rootpath+@"\Upload\OUT\A\"+filename, true);
+                File.Copy(template, rootpath + @"\Upload\OUT\B\" + filename, true);
             }
             foreach (int datitihao in type.Keys)
             {
                 foreach (int tihao in questions.Keys)
                 {
-                    
-                    MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
-                    string course = question.Course.ToString();
-                    string section = question.Section.ToString();
-                    string questiontype = question.Type.ToString();
-                    string difficulty = question.Difficulty.ToString();
-                    if(questiontype == type[datitihao].Type.ToString())
+                    if(tihao<=questions.Keys.Count()/2)
                     {
-                        string filepath = rootpath + @"\Upload\" + course + @"\" + section + @"\" + questiontype + @"\" + difficulty + @"\" + questions[tihao].ToString() + ".docx";
-                        if (!Directory.Exists(rootpath + @"\Upload\OUT\" + datitihao.ToString()))
+                        MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
+                        string course = question.Course.ToString();
+                        string section = question.Section.ToString();
+                        string questiontype = question.Type.ToString();
+                        string difficulty = question.Difficulty.ToString();
+                        if (questiontype == type[datitihao].Type.ToString())
                         {
-                            Directory.CreateDirectory(rootpath + @"\Upload\OUT\" + datitihao.ToString());
+                            string filepath = rootpath + @"\Upload\" + course + @"\" + section + @"\" + questiontype + @"\" + difficulty + @"\" + questions[tihao].ToString() + ".docx";
+                            if (!Directory.Exists(rootpath + @"\Upload\OUT\A\" + datitihao.ToString()))
+                            {
+                                Directory.CreateDirectory(rootpath + @"\Upload\OUT\A\" + datitihao.ToString());
+                            }
+                            string distpath = rootpath + @"\Upload\OUT\A\" + datitihao.ToString() + @"\" + tihao.ToString() + ".docx";
+                            File.Copy(filepath, distpath, true);
                         }
-                        string distpath = rootpath + @"\Upload\OUT\" + datitihao.ToString() + @"\" + tihao.ToString() + ".docx";
-                        File.Copy(filepath, distpath, true);
                     }
+                    else
+                    {
+                        MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
+                        string course = question.Course.ToString();
+                        string section = question.Section.ToString();
+                        string questiontype = question.Type.ToString();
+                        string difficulty = question.Difficulty.ToString();
+                        if (questiontype == type[datitihao].Type.ToString())
+                        {
+                            string filepath = rootpath + @"\Upload\" + course + @"\" + section + @"\" + questiontype + @"\" + difficulty + @"\" + questions[tihao].ToString() + ".docx";
+                            if (!Directory.Exists(rootpath + @"\Upload\OUT\B\" + datitihao.ToString()))
+                            {
+                                Directory.CreateDirectory(rootpath + @"\Upload\OUT\B\" + datitihao.ToString());
+                            }
+                            string distpath = rootpath + @"\Upload\OUT\B\" + datitihao.ToString() + @"\" + (tihao-questions.Keys.Count()/2).ToString() + ".docx";
+                            File.Copy(filepath, distpath, true);
+                        }
+                    }
+                    
                 }
             }
         }

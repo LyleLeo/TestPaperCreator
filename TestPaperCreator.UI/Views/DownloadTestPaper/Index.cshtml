@@ -285,7 +285,9 @@
                 console.log(year)
                 console.log(month)
                 console.log(day)
-                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/"+year+month+day+"/" + result + "'>A卷</a>"
+                console.log(result)
+                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[0] + "'>A卷</a>"
+                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[1] + "'>B卷</a>"
                 $("#footer").html(html);
             },
             complete: function () {

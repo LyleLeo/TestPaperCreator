@@ -173,9 +173,7 @@ namespace TestPaperCreator.DAL.TestPaperService
 
         }
         #endregion
-
         
-
         #region 根据条件获取试题ID集合
         /// <summary>
         /// 根据条件获取试题ID集合
@@ -195,7 +193,7 @@ namespace TestPaperCreator.DAL.TestPaperService
                 int difficulty = paper.paperproperty.difficulty;
                 int questiontype = paper.paperproperty.questiontype;
                 int major = paper.paperproperty.major;
-                int count = paper.count;
+                int count = paper.count*2;
                 string sql = "select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Flag=1";
                 //string sql = "select ID form Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + "  and Flag=1";
                 DataSet results = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
