@@ -194,44 +194,40 @@ namespace TestPaperCreator.DAL.TestPaperService
                 int questiontype = paper.paperproperty.questiontype;
                 int major = paper.paperproperty.major;
                 int count = paper.count*2;
-                string sql = "select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Flag=1";
-                //string sql = "select ID form Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + "  and Flag=1";
-                DataSet results = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
-                //results.Tables[0].Rows
-                List<int> a = new List<int>();//符合筛选条件的所有集合（已筛选课程，章节，难度，题型，未考虑权重）
-                foreach (DataRow dr in results.Tables[0].Rows)
-                {
-                    a.Add((int)dr[0]);
-                }
-                List<int> avaliableID = new List<int>();//考虑权重后可选的ID集合
+                //string sql = "select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Flag=1";
+                ////string sql = "select ID form Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + "  and Flag=1";
+                //DataSet results = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+                ////results.Tables[0].Rows
+                //List<int> a = new List<int>();//符合筛选条件的所有集合（已筛选课程，章节，难度，题型，未考虑权重）
+                //foreach (DataRow dr in results.Tables[0].Rows)
+                //{
+                //    a.Add((int)dr[0]);
+                //}
+                //List<int> avaliableID = new List<int>();//考虑权重后可选的ID集合
                 Random rd = new Random();
-                sql = "select min(Weight) from Major_Question where MajorID = " + major + " and QuestionID in (select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Flag=1) ";
-                var minweightobj = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
-                int minweight = 0;
-                if(minweightobj != DBNull.Value)
-                {
-                    minweight = (int)minweightobj;
-                }
-                do
-                {
-                    foreach (int i in a)
-                    {
-                        sql = "select Weight from Major_Question where QuestionID = " + i + " and MajorID = " + major;
-                        //sql = "insert into Major_Question (MajorID, QuestionID, Weight) values (1, " + i + ", 0)";
-                        var result = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
-                        if (result == null)
-                        {
-                            avaliableID.Add(i);
-                        }
-                        if( result != null && (int)result < minweight)
-                        {
-                            avaliableID.Add(i);
-                        }
-                    }
-                    minweight += 1;
-                } while (avaliableID.Count< paper.count);
+                string sql = "select min(Weight) from Major_Question where MajorID = " + major + " and QuestionID in (select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Flag=1) ";
+                int minweight = (int)SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+                sql = "select [QuestionID],[Weight] from Major_Question where QuestionID IN (SELECT id from [Questions]  where Course = " + course + " and Section = " + section + " and Difficulty = " + difficulty + " and Type = " + questiontype + " and Flag=1) and MajorID = " + major;
+                //do
+                //{
+                //    foreach (int i in a)
+                //    {
+                //        sql = "select Weight from Major_Question where QuestionID = " + i + " and MajorID = " + major;
+                //        //sql = "insert into Major_Question (MajorID, QuestionID, Weight) values (1, " + i + ", 0)";
+                //        int? result = (int)SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+                //        if (result <= minweight)
+                //        {
+                //            avaliableID.Add(i);
+                //        }
+                //    }
+                //    foreach(int i in avaliableID)
+                //    {
+                //        a.Remove(i);
+                //    }
+                //    minweight++;
+                //} while (avaliableID.Count< paper.count);
                 //List<int> SatisfactoryID = GetID(avaliableID, paper.count, (int)minweight,a,major);
-                
+
                 List<int> c = new List<int>();
                 for (int i = 0; i < count;)
                 {
@@ -430,5 +426,42 @@ namespace TestPaperCreator.DAL.TestPaperService
         }
         #endregion
 
+        #region 补齐空缺的M-Q值
+        public static void magic()
+        {
+            string sql = "select id from questions where flag = 1";
+            List<int> questionidlist = new List<int>();
+            DataSet result = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+            foreach(DataRow dr in result.Tables[0].Rows)
+            {
+                questionidlist.Add((int)dr[0]);
+            }
+            List<int> majoridlist = new List<int>();
+            sql = "select id from major where flag = 1";
+            result = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+            foreach (DataRow dr in result.Tables[0].Rows)
+            {
+                majoridlist.Add((int)dr[0]);
+            }
+            sql = "select max(id) from Major_Question";
+            int maxid = 1;
+            var maxidinDB = SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+            if(maxidinDB != DBNull.Value)
+            {
+                maxid = (int)maxidinDB;
+            }
+            sql = "insert into Major_Question values ";
+            foreach(var i in majoridlist)
+            {
+                foreach(var j in questionidlist)
+                {
+                    sql += "(" + i + "," + j + ",0),";
+                    maxid++;
+                }
+            }
+            sql = sql.Remove(sql.Length - 1,1);
+            string a = "13";
+        }
+        #endregion
     }
 }

@@ -56,7 +56,7 @@ namespace TestPaperCreator.Controllers
                 }
             }
             ViewBag.Title = "Home Page";
-
+            //BLL.TestPaperService.TestPaperService.magic();
 
             return View();
         }
