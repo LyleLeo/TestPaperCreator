@@ -9,7 +9,7 @@ namespace TestPaperCreator.BLL.TestPaperService
 {
     public class TestPaperService
     {
-        public static IDictionary<string,string> GetProperty()
+        public static IDictionary<string, string> GetProperty()
         {
             return DAL.TestPaperService.TestPaperService.GetProperty();
         }
@@ -58,7 +58,7 @@ namespace TestPaperCreator.BLL.TestPaperService
         {
             DAL.TestPaperService.TestPaperService.magic();
         }
-        public static void CopyFiles(Dictionary<int,int> questions,string rootpath, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
+        public static void CopyFiles(Dictionary<int, int> questions, string rootpath, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
         {
             if (!Directory.Exists(rootpath + @"\Upload\OUT\A\"))
             {
@@ -69,17 +69,18 @@ namespace TestPaperCreator.BLL.TestPaperService
                 Directory.CreateDirectory(rootpath + @"\Upload\OUT\B\");
             }
             string[] templates = Directory.GetFiles(rootpath + @"\Files\", "*.dotx");
-            foreach(string template in templates)
+            foreach (string template in templates)
             {
                 string filename = Path.GetFileName(template);
-                File.Copy(template, rootpath+@"\Upload\OUT\A\"+filename, true);
+                File.Copy(template, rootpath + @"\Upload\OUT\A\" + filename, true);
                 File.Copy(template, rootpath + @"\Upload\OUT\B\" + filename, true);
             }
+
             foreach (int datitihao in type.Keys)
             {
                 foreach (int tihao in questions.Keys)
                 {
-                    if(tihao<=questions.Keys.Count()/2)
+                     if (tihao <= questions.Keys.Count/2)
                     {
                         MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
                         string course = question.Course.ToString();
@@ -89,17 +90,24 @@ namespace TestPaperCreator.BLL.TestPaperService
                         if (questiontype == type[datitihao].Type.ToString())
                         {
                             string filepath = rootpath + @"\Upload\" + course + @"\" + section + @"\" + questiontype + @"\" + difficulty + @"\" + questions[tihao].ToString() + ".docx";
+                            string answerfilepath = rootpath + @"\Upload\" + course + @"\" + section + @"\" + questiontype + @"\" + difficulty + @"\" + questions[tihao].ToString() + "_answer.docx";
                             if (!Directory.Exists(rootpath + @"\Upload\OUT\A\" + datitihao.ToString()))
                             {
                                 Directory.CreateDirectory(rootpath + @"\Upload\OUT\A\" + datitihao.ToString());
                             }
+                            if (!Directory.Exists(rootpath + @"\Upload\OUT\A\" + datitihao.ToString() + @"\ANSWER\"))
+                            {
+                                Directory.CreateDirectory(rootpath + @"\Upload\OUT\A\" + datitihao.ToString() + @"\ANSWER\");
+                            }
                             string distpath = rootpath + @"\Upload\OUT\A\" + datitihao.ToString() + @"\" + tihao.ToString() + ".docx";
+                            string answerdistpath = rootpath + @"\Upload\OUT\A\" + datitihao.ToString() + @"\ANSWER\" + tihao.ToString() + ".docx";
                             File.Copy(filepath, distpath, true);
+                            File.Copy(answerfilepath, answerdistpath, true);
                         }
                     }
                     else
-                    {
-                        MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
+                          {
+                                MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
                         string course = question.Course.ToString();
                         string section = question.Section.ToString();
                         string questiontype = question.Type.ToString();
@@ -107,15 +115,22 @@ namespace TestPaperCreator.BLL.TestPaperService
                         if (questiontype == type[datitihao].Type.ToString())
                         {
                             string filepath = rootpath + @"\Upload\" + course + @"\" + section + @"\" + questiontype + @"\" + difficulty + @"\" + questions[tihao].ToString() + ".docx";
+                            string answerfilepath = rootpath + @"\Upload\" + course + @"\" + section + @"\" + questiontype + @"\" + difficulty + @"\" + questions[tihao].ToString() + "_answer.docx";
                             if (!Directory.Exists(rootpath + @"\Upload\OUT\B\" + datitihao.ToString()))
                             {
                                 Directory.CreateDirectory(rootpath + @"\Upload\OUT\B\" + datitihao.ToString());
                             }
-                            string distpath = rootpath + @"\Upload\OUT\B\" + datitihao.ToString() + @"\" + (tihao-questions.Keys.Count()/2).ToString() + ".docx";
+                            if (!Directory.Exists(rootpath + @"\Upload\OUT\B\" + datitihao.ToString() + @"\ANSWER\"))
+                            {
+                                Directory.CreateDirectory(rootpath + @"\Upload\OUT\B\" + datitihao.ToString() + @"\ANSWER\");
+                            }
+                            string distpath = rootpath + @"\Upload\OUT\B\" + datitihao.ToString() + @"\" + (tihao - questions.Keys.Count() / 2).ToString() + ".docx";
+                            string answerdistpath = rootpath + @"\Upload\OUT\B\" + datitihao.ToString() + @"\ANSWER\" + (tihao - questions.Keys.Count() / 2).ToString() + ".docx";
                             File.Copy(filepath, distpath, true);
+                            File.Copy(answerfilepath, answerdistpath, true);
                         }
                     }
-                    
+
                 }
             }
         }

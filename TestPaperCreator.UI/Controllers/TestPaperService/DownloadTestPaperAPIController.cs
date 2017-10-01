@@ -78,6 +78,8 @@ namespace TestPaperCreator.Controllers.TestPaperService
             string strCopyFolderB = rootpath + @"\Upload\OUT\B\";
             BLL.Utility.OpenXmlForOffice.CreatePaper(paperheadA, paperbodyA, strCopyFolderA, type, property);
             BLL.Utility.OpenXmlForOffice.CreatePaper(paperheadB, paperbodyB, strCopyFolderB, type, property);
+            BLL.Utility.OpenXmlForOffice.CreateAnswer(paperheadA, paperbodyA, strCopyFolderA, type, property);
+            BLL.Utility.OpenXmlForOffice.CreateAnswer(paperheadB, paperbodyB, strCopyFolderB, type, property);
             string resultnameA = Path.GetFileName(Directory.GetFiles(rootpath + @"\Upload\OUT\A\final\")[0]);
             string resultnameB = Path.GetFileName(Directory.GetFiles(rootpath + @"\Upload\OUT\B\final\")[0]);
             string finalfileA = rootpath + @"\Upload\OUT\A\final\" + resultnameA;

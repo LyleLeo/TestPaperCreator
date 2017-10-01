@@ -187,7 +187,7 @@ namespace TestPaperCreator.DAL.TestPaperService
             
             foreach (MODEL.TestPaper.Paper paper in paperlist)
             {
-                List<int> b = new List<int>();
+                List<int> b = new List<int>();//每个题型的最终结果集合
                 int course = paper.paperproperty.course;
                 int section = paper.paperproperty.section;
                 int difficulty = paper.paperproperty.difficulty;
@@ -203,11 +203,21 @@ namespace TestPaperCreator.DAL.TestPaperService
                 //{
                 //    a.Add((int)dr[0]);
                 //}
-                //List<int> avaliableID = new List<int>();//考虑权重后可选的ID集合
+                List<int> avaliableID = new List<int>();//考虑权重后可选的ID集合
                 Random rd = new Random();
                 string sql = "select min(Weight) from Major_Question where MajorID = " + major + " and QuestionID in (select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Flag=1) ";
                 int minweight = (int)SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
-                sql = "select [QuestionID],[Weight] from Major_Question where QuestionID IN (SELECT id from [Questions]  where Course = " + course + " and Section = " + section + " and Difficulty = " + difficulty + " and Type = " + questiontype + " and Flag=1) and MajorID = " + major;
+                do
+                {
+                    sql = "select [QuestionID],[Weight] from Major_Question where QuestionID IN (SELECT id from [Questions]  where Course = " + course + " and Section = " + section + " and Difficulty = " + difficulty + " and Type = " + questiontype + " and Flag=1) and MajorID = " + major + " and weight = " + minweight;
+                    DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+                    foreach(DataRow dr in ds.Tables[0].Rows)
+                    {
+                        avaliableID.Add((int)dr[0]);
+                    }
+                    minweight++;
+                } while (avaliableID.Count < count);
+                
                 //do
                 //{
                 //    foreach (int i in a)
@@ -231,17 +241,17 @@ namespace TestPaperCreator.DAL.TestPaperService
                 List<int> c = new List<int>();
                 for (int i = 0; i < count;)
                 {
-                    int r = rd.Next(0, a.Count);
+                    int r = rd.Next(0, avaliableID.Count);
                     if (c.Contains(r))
                     {
                         continue;
                     }
-                    b.Add(a[r]);
+                    b.Add(avaliableID[r]);
                     c.Add(r);
                     i++;
                 }
                 paperDic.Add(questiontype, b);
-                //paperDic[questiontype] = b;
+                paperDic[questiontype] = b;
             }
             return paperDic;
         }
@@ -254,7 +264,8 @@ namespace TestPaperCreator.DAL.TestPaperService
             int section = paper.paperproperty.section;
             int questiontype = paper.paperproperty.questiontype;
             int difficulty = paper.paperproperty.difficulty;
-            string sql = "select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Weight in(select MIN(Weight) from Questions)  and Flag=1";
+            string sql = "select ID from Major_Question where Questionid in (select id from Questions where Course = " + course + " and Section = " + section + " and Difficulty = " + section + " and Type = " + questiontype + ") and Weight in(select min(Weight) from Major_Question where Questionid in (select id from Questions where Course = " + course + " and Section = " + section + " and Difficulty = " + difficulty + " and Type = " + questiontype + "))";
+            //string sql = "select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Weight in(select MIN(Weight) from Questions)  and Flag=1";
             DataSet results = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
             List<int> a = new List<int>();
             foreach (DataRow dr in results.Tables[0].Rows)
@@ -378,6 +389,35 @@ namespace TestPaperCreator.DAL.TestPaperService
             return question;
         }
         #endregion
+        #region 根据ID获取答案
+        public static MODEL.TestPaper.Question GetAnswerByID(int id)
+        {
+            MODEL.TestPaper.Question answer = new MODEL.TestPaper.Question();
+            string sql = "select questions.ID,questions.Type, questiontype.Value ,questions.Course, course.Value,questions.Section, section.Value,questions.Difficulty, difficulty.Value, questions.Content from Questions questions, Difficulty difficulty, Course course, Section section, Type questiontype where questions.Type = questiontype.ID and questions.Course = course.ID and questions.Section = section.ID and questions.Difficulty = difficulty.ID and questions.ID =" + id;
+            DataSet result = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+            foreach (DataRow dr in result.Tables[0].Rows)
+            {
+                answer.ID = (int)dr[0];
+                answer.Type = (int)dr[1];
+                answer.TypeName = (string)dr[2];
+                answer.Course = (int)dr[3];
+                answer.CourseName = (string)dr[4];
+                answer.Section = (int)dr[5];
+                answer.SectionName = (string)dr[6];
+                answer.Difficulty = (int)dr[7];
+                answer.DifficultyName = (string)dr[8];
+                if (dr[9] != DBNull.Value)
+                {
+                    answer.Content = (string)dr[9];
+                }
+                else
+                {
+                    answer.Content = "";
+                }
+            }
+            return answer;
+        }
+        #endregion
 
         #region 清除题目中的某个字符
         public static void ClearQuestionMark(string tobecleared)
@@ -460,7 +500,6 @@ namespace TestPaperCreator.DAL.TestPaperService
                 }
             }
             sql = sql.Remove(sql.Length - 1,1);
-            string a = "13";
         }
         #endregion
     }
