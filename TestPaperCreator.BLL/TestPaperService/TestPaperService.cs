@@ -58,6 +58,10 @@ namespace TestPaperCreator.BLL.TestPaperService
         {
             DAL.TestPaperService.TestPaperService.magic();
         }
+        public static string Confirm(int majorid,List<int> questionlist)
+        {
+            return DAL.TestPaperService.TestPaperService.Confirm(majorid, questionlist);
+        }
         public static void CopyFiles(Dictionary<int, int> questions, string rootpath, Dictionary<int, MODEL.TestPaper.SingleDaTi> type)
         {
             if (!Directory.Exists(rootpath + @"\Upload\OUT\A\"))
@@ -80,7 +84,7 @@ namespace TestPaperCreator.BLL.TestPaperService
             {
                 foreach (int tihao in questions.Keys)
                 {
-                     if (tihao <= questions.Keys.Count/2)
+                    if (tihao <= questions.Keys.Count / 2)
                     {
                         MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
                         string course = question.Course.ToString();
@@ -106,8 +110,8 @@ namespace TestPaperCreator.BLL.TestPaperService
                         }
                     }
                     else
-                          {
-                                MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
+                    {
+                        MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(questions[tihao]);
                         string course = question.Course.ToString();
                         string section = question.Section.ToString();
                         string questiontype = question.Type.ToString();

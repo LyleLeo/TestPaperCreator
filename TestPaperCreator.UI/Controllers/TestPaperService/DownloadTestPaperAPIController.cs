@@ -9,6 +9,7 @@ namespace TestPaperCreator.Controllers.TestPaperService
 {
     public class DownloadTestPaperAPIController : ApiController
     {
+        #region 获取符合条件的试题
         [HttpPost]
         [Route("api/DownloadTestPaperAPI/GetQuestionID/")]
         public List<MODEL.TestPaper.Question> GetQuestionID([FromBody]List<MODEL.TestPaper.Paper> paperlist)
@@ -16,6 +17,27 @@ namespace TestPaperCreator.Controllers.TestPaperService
             string localPath = Path.Combine(HttpRuntime.AppDomainAppPath, "Upload");
             return BLL.OfficeHelper.WordDocumentMerger.GetPaperQuestionList(paperlist, localPath);
         }
+        #endregion
+
+        #region 确认添加权重
+        [HttpPost]
+        [Route("api/DownloadTestPaperAPI/Confirm/")]
+        public string Confirm(dynamic obj)
+        {
+            List<int> questionlist = new List<int>();
+            JArray jarray = obj.questionlist;
+            foreach (var item in jarray)
+            {
+                int i = Convert.ToInt32(item.ToString());
+                questionlist.Add(i);
+            }
+            int majorid = obj.majorname;
+            string result = BLL.TestPaperService.TestPaperService.Confirm(majorid, questionlist);
+            return "success";
+        }
+        #endregion
+
+        #region 换题
         [HttpPost]
         public MODEL.TestPaper.Question GetOneQuestion(dynamic obj)
         {
@@ -31,6 +53,9 @@ namespace TestPaperCreator.Controllers.TestPaperService
             MODEL.TestPaper.Paper paper = Newtonsoft.Json.JsonConvert.DeserializeObject<MODEL.TestPaper.Paper>(Convert.ToString(obj.paper));
             return BLL.TestPaperService.TestPaperService.GetOneQuestion(paper, oldidlist);
         }
+        #endregion
+
+        #region 生成试卷
         [HttpPost]
         [Route("api/DownloadTestPaperAPI/Generate/")]
         public List<string> Generate(dynamic obj)
@@ -80,23 +105,38 @@ namespace TestPaperCreator.Controllers.TestPaperService
             BLL.Utility.OpenXmlForOffice.CreatePaper(paperheadB, paperbodyB, strCopyFolderB, type, property);
             BLL.Utility.OpenXmlForOffice.CreateAnswer(paperheadA, paperbodyA, strCopyFolderA, type, property);
             BLL.Utility.OpenXmlForOffice.CreateAnswer(paperheadB, paperbodyB, strCopyFolderB, type, property);
-            string resultnameA = Path.GetFileName(Directory.GetFiles(rootpath + @"\Upload\OUT\A\final\")[0]);
-            string resultnameB = Path.GetFileName(Directory.GetFiles(rootpath + @"\Upload\OUT\B\final\")[0]);
-            string finalfileA = rootpath + @"\Upload\OUT\A\final\" + resultnameA;
-            string finalfileB = rootpath + @"\Upload\OUT\B\final\" + resultnameB;
+            string[] volumeA = Directory.GetFiles(rootpath + @"\Upload\OUT\A\final\");
+            string[] volumeB = Directory.GetFiles(rootpath + @"\Upload\OUT\B\final\");
+            string resultnameA = volumeA[0];
+            string resultnameAanswer = volumeA[1];
+            string resultnameB = volumeB[0];
+            string resultnameBanswer = volumeB[1];
+            string finalfileA = Path.GetFileName(rootpath + @"\Upload\OUT\A\final\" + resultnameA);
+            string finalfileAanswer = Path.GetFileName(rootpath + @"\Upload\OUT\A\final\" + resultnameAanswer);
+            string finalfileB = Path.GetFileName(rootpath + @"\Upload\OUT\B\final\" + resultnameB);
+            string finalfileBanswer = Path.GetFileName(rootpath + @"\Upload\OUT\B\final\" + resultnameBanswer);
             if (!Directory.Exists(rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day))
             {
                 Directory.CreateDirectory(rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day);
             }
-            string a = rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + @"\" + resultnameA;
-            string b = rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + @"\" + resultnameB;
-            File.Copy(finalfileA, a, true);
-            File.Copy(finalfileB, b, true);
+            string a = rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + @"\" + finalfileA;
+            string aa = rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + @"\" + finalfileAanswer;
+            string b = rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + @"\" + finalfileB;
+            string ba = rootpath + @"\Upload\Results\" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + @"\" + finalfileBanswer;
+            File.Copy(resultnameA, a, true);
+            File.Copy(resultnameAanswer, aa, true);
+            File.Copy(resultnameB, b, true);
+            File.Copy(resultnameBanswer, ba, true);
             List<string> filelist = new List<string>();
-            filelist.Add(resultnameA);
-            filelist.Add(resultnameB);
+            filelist.Add(finalfileA);
+            filelist.Add(finalfileAanswer);
+            filelist.Add(finalfileB);
+            filelist.Add(finalfileBanswer);
             return filelist;
         }
+        #endregion
+
+        #region 删除临时文件
         [HttpPost]
         [Route("api/DownloadTestPaperAPI/DeleteTemp/")]
         public string DeleteTemp()
@@ -127,9 +167,10 @@ namespace TestPaperCreator.Controllers.TestPaperService
                 }
                 Directory.Delete(srcPath);
             }
-            
+
             return "success";
         }
+        #endregion
     }
 
     class DaTi

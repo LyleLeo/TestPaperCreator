@@ -58,6 +58,21 @@ namespace TestPaperCreator.DAL.TestPaperService
             try
             {
                 SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
+                if (Condition == "Major")
+                {
+                    if (Flag == 1)
+                    {
+                        sql = "select id from " + Condition + " where Value = '" + Value + "'";
+                        int majorid = (int)SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+                        InsertMajor(majorid);
+                    }
+                    else
+                    {
+                        sql = "select id from " + Condition + " where Value = '" + Value + "'";
+                        int majorid = (int)SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+                        DeleteMajor(majorid);
+                    }
+                }
             }
             catch
             {
@@ -66,6 +81,24 @@ namespace TestPaperCreator.DAL.TestPaperService
             return true;
         }
         #endregion
+
+        public static void InsertMajor(int majorid)
+        {
+            string sql = "insert into Major_Question (MajorID,QuestionID,Weight) values ";
+            string ssql = "select ID from Questions where Flag = 1";
+            DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, ssql);
+            foreach(DataRow dr in ds.Tables[0].Rows)
+            {
+                sql += "("+ majorid+"," + dr[0].ToString()+",0),";
+            }
+            sql = sql.Substring(0, sql.Length - 1);
+            SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
+        }
+        public static void DeleteMajor(int majorid)
+        {
+            string sql = "delete from Major_Question where MajorID = " + majorid;
+            SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
+        }
 
         #region 查询课程
         public static List<MODEL.TestPaper.Condition> GetCourse()
@@ -159,7 +192,7 @@ namespace TestPaperCreator.DAL.TestPaperService
         /// <param name="section">章节</param>
         /// <param name="difficulty">难易度</param>
         /// <returns>成功或失败</returns>
-        public static void InsertQuestion(int course, int questiontype, int section, int difficulty, string content)
+        public static void InsertQuestion(int course, int questiontype, int section, int difficulty, string content,int questionid)
         {
             string sql = "insert into Questions (Type, Course, Section, Difficulty, Weight, Time, Flag,Content) values (" + questiontype + "," + course + "," + section + "," + difficulty + ",0,'" + DateTime.Now.ToShortDateString() + "',1,'"+content.ToString()+"')";
             try
@@ -170,7 +203,18 @@ namespace TestPaperCreator.DAL.TestPaperService
             {
                 throw e;
             }
-
+            sql = "select id from Major where Flag = 1 ";
+            DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
+            List<int> majoridlist = new List<int>();
+            foreach(DataRow dr in ds.Tables[0].Rows)
+            {
+                majoridlist.Add((int)dr[0]);
+            }
+            foreach(int i in majoridlist)
+            {
+                sql = "insert into Major_Question values (" + i + "," + questionid + ",0)";
+                SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
+            }
         }
         #endregion
         
@@ -257,6 +301,39 @@ namespace TestPaperCreator.DAL.TestPaperService
         }
         #endregion
 
+        #region 确认试卷，增加权重
+        public static string Confirm(int majorid,List<int> questionlist)
+        {
+            int length = questionlist.Count;
+            string sql = "";
+            try
+            {
+                foreach (int i in questionlist)
+                {
+                    sql = "update Major_Question set weight = (select weight from Major_Question where MajorID = " + majorid + " and QuestionID = " + i + ")+1 where MajorID = " + majorid + " and QuestionID = " + i;
+                    SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
+                }
+                return "success";
+            }
+            catch(Exception e)
+            {
+                return e.ToString();
+            }
+            
+            //psql = psql.Substring(0, psql.Length - 1);
+            //string sql = "update Major_Question set weight == weight+1 where QuestionID in (" + psql + ") and MajorID = " + majorid;
+            //try
+            //{
+            //    SqlHelper.ExecuteScalar(sql, CommandType.Text, sql);
+            //    return "success";
+            //}
+            //catch (Exception e)
+            //{
+            //    return e.ToString();
+            //}
+        }
+        #endregion
+
         #region 更换题目
         public static MODEL.TestPaper.Question GetOneQuestion(MODEL.TestPaper.Paper paper,List<int> oldidlist)
         {
@@ -264,7 +341,7 @@ namespace TestPaperCreator.DAL.TestPaperService
             int section = paper.paperproperty.section;
             int questiontype = paper.paperproperty.questiontype;
             int difficulty = paper.paperproperty.difficulty;
-            string sql = "select ID from Major_Question where Questionid in (select id from Questions where Course = " + course + " and Section = " + section + " and Difficulty = " + section + " and Type = " + questiontype + ") and Weight in(select min(Weight) from Major_Question where Questionid in (select id from Questions where Course = " + course + " and Section = " + section + " and Difficulty = " + difficulty + " and Type = " + questiontype + "))";
+            string sql = "select QuestionID from Major_Question where Questionid in (select id from Questions where Course = " + course + " and Section = " + section + " and Difficulty = " + section + " and Type = " + questiontype + ") and Weight in(select min(Weight) from Major_Question where Questionid in (select id from Questions where Course = " + course + " and Section = " + section + " and Difficulty = " + difficulty + " and Type = " + questiontype + "))";
             //string sql = "select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Weight in(select MIN(Weight) from Questions)  and Flag=1";
             DataSet results = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
             List<int> a = new List<int>();
@@ -389,6 +466,7 @@ namespace TestPaperCreator.DAL.TestPaperService
             return question;
         }
         #endregion
+
         #region 根据ID获取答案
         public static MODEL.TestPaper.Question GetAnswerByID(int id)
         {

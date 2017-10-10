@@ -15,7 +15,6 @@ namespace TestPaperCreator.Controllers.TestPaperService
         public IHttpActionResult UpLoadProcess(string id, string name, string type, string lastModifiedDate, int size, int course, int questiontype, int section, int difficulty, HttpPostedFileBase file)
         {
             string filePathName = string.Empty;
-
             string localPath = Path.Combine(HttpRuntime.AppDomainAppPath, "Upload");
             string path = "\\" + course.ToString() + "\\" + section.ToString() + "\\" + questiontype.ToString() + "\\" + difficulty.ToString() + "\\";
             localPath += path;

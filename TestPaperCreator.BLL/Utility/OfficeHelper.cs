@@ -244,7 +244,7 @@ namespace TestPaperCreator.BLL.OfficeHelper
                         wh.InsertText(arrays[i]);
                         wh.SaveAs(filepath + id.ToString() + ".docx");
                         wh.Close();
-                        DAL.TestPaperService.TestPaperService.InsertQuestion(question.Course, question.Type, question.Section, question.Difficulty, arrays[i].Trim());
+                        DAL.TestPaperService.TestPaperService.InsertQuestion(question.Course, question.Type, question.Section, question.Difficulty, arrays[i].Trim(),id);
                     }
                     else
                     {
@@ -338,12 +338,19 @@ namespace TestPaperCreator.BLL.OfficeHelper
             IDictionary<int,List<int>> typequestionidDic = DAL.TestPaperService.TestPaperService.GetQuestionID(paperlist);
             //把问题复制到Output文件夹
             List<MODEL.TestPaper.Question> questionlist = new List<MODEL.TestPaper.Question>();
+            
             foreach (int questiontypeid in typequestionidDic.Keys)
             {
-                foreach(int id in typequestionidDic[questiontypeid])
+                int xiaotitihao = 1;
+                foreach (int id in typequestionidDic[questiontypeid])
                 {
-                    MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(id);
-                    questionlist.Add(question);
+                    if(xiaotitihao<=typequestionidDic[questiontypeid].Count/2)
+                    {
+                        MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(id);
+                        questionlist.Add(question);
+                        xiaotitihao++;
+                    }
+                    
                     //string sourceurl = localpath + "\\" + question.Course.ToString() + "\\" + question.Section.ToString() + "\\" + question.Type.ToString() + "\\" + question.Difficulty.ToString() + "\\";
                     //string destinationurl = localpath + "\\Output\\Questions\\" + question.Type.ToString() + "\\";
                     //string sourceFile = sourceurl + question.ID.ToString() + ".docx";
@@ -355,6 +362,31 @@ namespace TestPaperCreator.BLL.OfficeHelper
                     //bool isrewrite = true; // true=覆盖已存在的同名文件,false则反之
                     //File.Copy(sourceFile, destinationFile, isrewrite);
                 }   
+            }
+            foreach (int questiontypeid in typequestionidDic.Keys)
+            {
+                int xiaotitihao = 1;
+                foreach (int id in typequestionidDic[questiontypeid])
+                {
+                    if (xiaotitihao > typequestionidDic[questiontypeid].Count / 2)
+                    {
+                        MODEL.TestPaper.Question question = DAL.TestPaperService.TestPaperService.GetAQuestionByID(id);
+                        questionlist.Add(question);
+                        
+                    }
+                    xiaotitihao++;
+
+                    //string sourceurl = localpath + "\\" + question.Course.ToString() + "\\" + question.Section.ToString() + "\\" + question.Type.ToString() + "\\" + question.Difficulty.ToString() + "\\";
+                    //string destinationurl = localpath + "\\Output\\Questions\\" + question.Type.ToString() + "\\";
+                    //string sourceFile = sourceurl + question.ID.ToString() + ".docx";
+                    //string destinationFile = localpath + "\\Output\\Questions\\" + question.Type.ToString() + "\\" + question.ID.ToString() + ".docx";
+                    //if (!Directory.Exists(destinationurl))
+                    //{
+                    //    Directory.CreateDirectory(destinationurl);
+                    //}
+                    //bool isrewrite = true; // true=覆盖已存在的同名文件,false则反之
+                    //File.Copy(sourceFile, destinationFile, isrewrite);
+                }
             }
             //string templatefile = localpath + "\\Output\\templet.dotx";
             //string outfile = localpath + "\\Output\\out.dotx";

@@ -117,13 +117,13 @@
             </div>
             <div class="col-lg-2 form-group">
                 专业名称：
-                    <select id="majorname" class="form-control">
-                        <option selected="" value="0">选择专业</option>
-                        @foreach (var i in ViewBag.Majorlist)
-                        {
-                            <option value="@i.id">@i.value</option>
-                        }
-                    </select>
+                <select id="majorname" class="form-control">
+                    <option selected="" value="0">选择专业</option>
+                    @foreach (var i in ViewBag.Majorlist)
+                    {
+                        <option value="@i.id">@i.value</option>
+                    }
+                </select>
             </div>
             <div class="col-lg-2 form-group">
                 学年：<input id="schoolyear" placeholder="例：2014-2015" class="form-control" type="text" value="@ViewBag.Property["schoolyear"]" />
@@ -222,7 +222,7 @@
         var classnumber = $("#final_class").val()
         var total_count = $("#total_count").text().split("：")[1]
         var total_score = $("#total_score").text().split("：")[1]
-        
+
         var tihao = 1
         var typelist = []
         $.each($("#Content").children("tr"), function (idx, obj) {
@@ -275,7 +275,7 @@
                 var pathName = window.document.location.pathname;
                 var pos = curWwwPath.indexOf(pathName);
                 var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
-                
+
                 $("#Generate").remove();
                 var html = ""
                 var date = new Date()
@@ -287,7 +287,10 @@
                 console.log(day)
                 console.log(result)
                 html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[0] + "'>A卷</a>"
-                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[1] + "'>B卷</a>"
+                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[1] + "'>A卷答案</a>"
+                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[2] + "'>B卷</a>"
+                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[3] + "'>B卷答案</a>"
+                html += "<a target='_blank' class='btn btn-danger pull-right' onclick='Confirm()'>确认试题</a>"
                 $("#footer").html(html);
             },
             complete: function () {
@@ -298,6 +301,40 @@
             },
         })
     }
+
+    function Confirm() {
+        var majorname = $("#final_majorname").find("option:selected").val()
+        console.log(majorname)
+        var questionlist = []
+        $.each($("#testpapertable").find("iframe"), function (index, obj) {
+            questionlist.push($(obj).attr("id"))
+        })
+        console.log(questionlist)
+        $.ajax({
+            url: "/api/DownloadTestPaperAPI/Confirm/",
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify({ majorname: majorname, questionlist: questionlist }),
+            beforeSend: function () {
+                $("#footer").find("a").last().text("确认中")
+                $("#footer").find("a").last().attr("disabled", "disabled")
+                $("#footer").find("a").last().attr("class", "btn btn-warning pull-right")
+
+            },
+            success: function (result) {
+                if (result == "success") {
+                    $("#footer").find("a").last().text("确认成功")
+                    $("#footer").find("a").last().attr("class", "btn btn-success pull-right")
+                }
+                else {
+                    $("#footer").find("a").last().removeAttr("disabled")
+                    $("#footer").find("a").last().text("确认失败，请重试")
+                    $("#footer").find("a").last().attr("class", "btn btn-warning pull-right")
+                }
+            }
+        })
+    }
+
     function Back(obj) {
         $(obj).parent().parent().hide()
         $("#final").children("div").eq(1).children("table").last().remove()
@@ -647,14 +684,14 @@
                 var sectionid = $(obj).children("td").eq(2).children("span").eq(0).text()
                 var difficultyid = $(obj).children("td").eq(3).children("span").eq(0).text()
                 var count = $(obj).children("td").eq(4).children("span").eq(0).text()
-                
+
                 paper = {
                     paperproperty: {
                         course: courseid,
                         questiontype: questiontypeid,
                         section: sectionid,
                         difficulty: difficultyid,
-                        major:majorid
+                        major: majorid
                     },
                     count: count
                 }
@@ -762,4 +799,5 @@
             $("#totalscore").val(parseInt($("#questioncount").val()) * parseInt($("#score").val()))
         }
     }
+
 </script>

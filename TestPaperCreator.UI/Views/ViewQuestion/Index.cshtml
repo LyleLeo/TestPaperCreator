@@ -23,8 +23,9 @@
     tr.shown td.details-control {
         background: url('../../images/details_close.png') no-repeat center center;
     }
-    iframe{
-        width:inherit;
+
+    iframe {
+        width: inherit;
     }
 </style>
 <div class="panel panel-primary">
@@ -47,24 +48,6 @@
     </div>
 </div>
 <script type="text/javascript">
-    function format(d) {
-        var width = $("#table_local").innerWidth()
-        var iframewidth = parseInt(width) / 2-16;//padding有8*2的宽度
-        var str = getAttarchmentPath(d) + '/files/';
-        var iframepageid = "iframepage" + d.ID.toString()
-        var res = verifyurl(str + d.ID.toString() + '.html')
-        if (verifyurl(str + d.ID.toString()+'.html') == 'error')
-        {
-            result = '没有文件'
-        }
-        else
-        {
-            var result = '<tr><th style="width:' + iframewidth + 'px" >题干</th><th style="width:' + iframewidth + 'px" >答案</th></tr><tr><td style="width:' + iframewidth + 'px"><iframe id="' + iframepageid + '" frameborder="1" scrolling="no" marginheight="0" width="' + iframewidth + '" height="200" marginwidth="0" src="' + str + d.ID.toString() + '.html"></iframe></td>' +
-            '<td style="width:' + iframewidth + 'px"><iframe id="' + iframepageid + '_answer" frameborder="1" scrolling="no" marginheight="0" height="200" width = "' + iframewidth + '" marginwidth="0" src="' + str + d.ID.toString() + '_answer.html"></iframe></td></tr>';
-        }
-       
-        return result
-    }
     $(document).ready(function () {
         var table = $("#table_local").DataTable({
             ajax: {
@@ -75,14 +58,14 @@
             },
             "columns": [
             {
-                "className":"details-control",
+                "className": "details-control",
                 "orderable": false,
                 "data": null,
                 "defaultContent": ''
             },
             {
                 "data": "ID",
-                "className":"hidden"
+                "className": "hidden"
             },
             { "data": "CourseName" },
             { "data": "SectionName" },
@@ -139,6 +122,23 @@
 
     });
 
+    function format(d) {
+        var width = $("#table_local").innerWidth()
+        var iframewidth = parseInt(width) / 2 - 16;//padding有8*2的宽度
+        var str = getAttarchmentPath(d) + '/files/';
+        var iframepageid = "iframepage" + d.ID.toString()
+        var res = verifyurl(str + d.ID.toString() + '.html')
+        if (verifyurl(str + d.ID.toString() + '.html') == 'error') {
+            result = '没有文件'
+        }
+        else {
+            var result = '<tr><th style="width:' + iframewidth + 'px" >题干</th><th style="width:' + iframewidth + 'px" >答案</th></tr><tr><td style="width:' + iframewidth + 'px"><iframe id="' + iframepageid + '" frameborder="1" scrolling="no" marginheight="0" width="' + iframewidth + '" height="200" marginwidth="0" src="' + str + d.ID.toString() + '.html"></iframe></td>' +
+            '<td style="width:' + iframewidth + 'px"><iframe id="' + iframepageid + '_answer" frameborder="1" scrolling="no" marginheight="0" height="200" width = "' + iframewidth + '" marginwidth="0" src="' + str + d.ID.toString() + '_answer.html"></iframe></td></tr>';
+        }
+
+        return result
+    }
+
     function Del(obj) {
         var id = parseInt($(obj).parent().attr("id"))
         alert(id)
@@ -164,8 +164,7 @@
         //$(obj).parent().parent().remove()
     }
 
-    function getAttarchmentPath(d)
-    {
+    function getAttarchmentPath(d) {
         var curWwwPath = window.document.location.href;
         var pathName = window.document.location.pathname;
         var pos = curWwwPath.indexOf(pathName);
@@ -173,6 +172,7 @@
         var str = localhostPaht + '/Upload' + '/' + d.Course.toString() + '/' + d.Section.toString() + '/' + d.Type.toString() + '/' + d.Difficulty.toString()
         return str
     }
+
     function verifyurl(url) {
         var res = ""
         $.ajax({
@@ -181,18 +181,15 @@
             url: url,
             data: "",
             error: function (XMLHttpRequest, textStatus) {
-                if(XMLHttpRequest.status == 404)
-                {
+                if (XMLHttpRequest.status == 404) {
                     console.log(11111111)
                     res = "not found"
                 }
-                else
-                {
+                else {
                     res = "found"
                 }
             }
         });
-        console.log(res)
         return res
     }
 </script>
