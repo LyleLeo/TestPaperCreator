@@ -269,6 +269,11 @@
             type: "POST",
             contentType: 'application/json',
             data: JSON.stringify({ questionlist: questionlist, typelist: typelist, property: property }),
+            beforeSend: function () {
+                $("#Generate").text("正在生成中")
+                $("#Generate").attr("disabled", "disabled")
+                $("#testpapertable").find("button").attr("disabled","disabled")
+            },
             success: function (result) {
                 alert("生成成功")
                 var curWwwPath = window.document.location.href;    //获取当前url
@@ -282,14 +287,11 @@
                 var year = date.getFullYear()
                 var month = date.getMonth() + 1
                 var day = date.getDate()
-                console.log(year)
-                console.log(month)
-                console.log(day)
-                console.log(result)
                 html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[0] + "'>A卷</a>"
                 html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[1] + "'>A卷答案</a>"
                 html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[2] + "'>B卷</a>"
                 html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[3] + "'>B卷答案</a>"
+                html += "<a target='_blank' class='btn btn-default' onclick='edit()'>编辑</a>"
                 html += "<a target='_blank' class='btn btn-danger pull-right' onclick='Confirm()'>确认试题</a>"
                 $("#footer").html(html);
             },
@@ -300,6 +302,16 @@
                 })
             },
         })
+    }
+
+    function edit()
+    {
+        $("#testpapertable").find("button").removeAttr("disabled")
+        $("#footer").find("a").remove()
+        var html = ""
+        html+='<button id="Generate" class="btn btn-default" onclick="Generate()">生成</button>'
+        $("#footer").html(html)
+
     }
 
     function Confirm() {

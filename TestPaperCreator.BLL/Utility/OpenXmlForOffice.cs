@@ -266,10 +266,14 @@ namespace TestPaperCreator.BLL.Utility
         #endregion
 
         #region 将大题合并到试卷
-        public static void MergeDatiToPaper(string paperhead, string strCopyFolder, MODEL.TestPaper.PaperProperty paperproperty)
+        public static void MergeDatiToPaper(string paperhead, string strCopyFolder, MODEL.TestPaper.PaperProperty paperproperty, bool isanswer)
         {
             string name = Guid.NewGuid().ToString();
-            name = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + DateTime.Now.Millisecond.ToString();
+            name = DateTime.Now.Year.ToString() + DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + DateTime.Now.Millisecond.ToString() + paperproperty.majorname + paperproperty.volume;
+            if (isanswer)
+            {
+                name += "_answer";
+            }
             #region 复制大题模板并转换为docx格式
             string sourceFile = paperhead;
             if (!Directory.Exists(System.IO.Path.GetDirectoryName(paperhead) + @"\final\"))
@@ -787,22 +791,22 @@ namespace TestPaperCreator.BLL.Utility
         /// <param name="outfile">输出文档</param>
         /// <param name="strCopyFolder">待插入题的文件夹</param>
         /// <param name="type">大题字典，key为题号，value为题型</param>
-        public static void CreatePaper(string paperhead, string paperbody, string strCopyFolder, Dictionary<int, MODEL.TestPaper.SingleDaTi> type, MODEL.TestPaper.PaperProperty paperproperty)
+        public static void CreatePaper(string paperhead, string paperbody, string strCopyFolder, Dictionary<int, MODEL.TestPaper.SingleDaTi> type, MODEL.TestPaper.PaperProperty paperproperty, bool isanswer)
         {
             //将小题组合成大题，按题号命名，放在OUT文件夹内
             InsertDaTi(paperhead, paperbody, strCopyFolder, type);
             //将大题合并成试卷
-            MergeDatiToPaper(paperhead, strCopyFolder, paperproperty);
+            MergeDatiToPaper(paperhead, strCopyFolder, paperproperty, isanswer);
         }
         #endregion
 
         #region 合并答案
-        public static void CreateAnswer(string paperhead, string paperbody, string strCopyFolder, Dictionary<int, MODEL.TestPaper.SingleDaTi> type, MODEL.TestPaper.PaperProperty paperproperty)
+        public static void CreateAnswer(string paperhead, string paperbody, string strCopyFolder, Dictionary<int, MODEL.TestPaper.SingleDaTi> type, MODEL.TestPaper.PaperProperty paperproperty, bool isanswer)
         {
             //将小题组合成大题，按题号命名，放在OUT文件夹内
             InsertDaTiAnswer(paperhead, paperbody, strCopyFolder, type);
             //将大题合并成试卷
-            MergeDatiToPaper(paperhead, strCopyFolder, paperproperty);
+            MergeDatiToPaper(paperhead, strCopyFolder, paperproperty, isanswer);
         }
         #endregion
     }
