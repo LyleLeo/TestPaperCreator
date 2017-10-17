@@ -427,7 +427,9 @@ namespace TestPaperCreator.DAL.TestPaperService
             string sql = "update Questions set Flag = 0 where id = " + questionid;
             try
             {
-                var result = SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
+                SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
+                sql = "delete from Major_Question where QuestionID = " + questionid;
+                SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
                 return true;
             }
             catch

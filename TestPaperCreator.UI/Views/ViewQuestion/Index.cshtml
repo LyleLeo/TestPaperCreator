@@ -5,11 +5,6 @@
 }
 
 <h1>试题管理</h1>
-@*@foreach(var i in ViewBag.questionlist)
-    {
-        <div>@i.ID , @i.Type , @i.Course , @i.Section , @i.Difficulty </div>
-        <br />
-    }*@
 <style>
     td, th {
         color: black;
@@ -27,6 +22,9 @@
     iframe {
         width: inherit;
     }
+    .break{
+        word-wrap:break-word
+    }
 </style>
 <div class="panel panel-primary">
     <div class="panel-heading">试题管理</div>
@@ -37,9 +35,13 @@
                     <th></th>
                     <th hidden="hidden">ID</th>
                     <th>科目</th>
+                    <th hidden="hidden">科目ID</th>
                     <th>章节</th>
+                    <th hidden="hidden">章节ID</th>
                     <th>题型</th>
+                    <th hidden="hidden">题型ID</th>
                     <th>难度</th>
+                    <th hidden="hidden">题型ID</th>
                     <th hidden="hidden">内容</th>
                     <th>操作</th>
                 </tr>
@@ -47,6 +49,14 @@
         </table>
     </div>
 </div>
+<div hidden="hidden" id="uploader" class="wu-example">
+    <div id="thelist" class="uploader-list"></div>
+    <div class="btns">
+        <div id="picker">选择文件</div>
+        <button id="ctlBtn" class="btn btn-default">开始上传</button>
+
+    </div>
+</div> 
 <script type="text/javascript">
     $(document).ready(function () {
         var table = $("#table_local").DataTable({
@@ -61,27 +71,36 @@
                 "className": "details-control",
                 "orderable": false,
                 "data": null,
-                "defaultContent": ''
+                "defaultContent": '',
+                "width": "5%",
+                "name":"namee"
             },
             {
                 "data": "ID",
-                "className": "hidden"
+                "className": "hidden",
             },
-            { "data": "CourseName" },
-            { "data": "SectionName" },
-            { "data": "TypeName" },
-            { "data": "DifficultyName" },
+            { "data": "CourseName", "width": "19%" },
+            { "className": "hidden", "data": "Course" },
+            { "data": "SectionName", "width": "19%" },
+            { "className": "hidden", "data": "Section" },
+            {
+                "data": "TypeName",
+                "width": "19%"
+            },
+            { "className": "hidden", "data": "Type" },
+            { "data": "DifficultyName", "width": "19%" },
+            { "className": "hidden", "data": "Difficulty" },
             {
                 "className": "hidden",
                 "data": "Content"
             },
             {
-                "data": null,
-                "defaultContent": '<button class="btn btn-success" type="button" this>下载</button><button class="btn btn-warning" type="button" this>删除</button>'
+                "width": "19%",
+                "defaultContent": '<button class="btn btn-success" type="button" onclick="download(this,0)"><span class="glyphicon glyphicon-download-alt"></span></button><button class="btn btn-success" type="button" onclick="download(this,1)"><span class="glyphicon glyphicon-save"></span></button><button class="btn btn-warning" type="button" onclick="Del(this)"><span class="glyphicon glyphicon-trash"></span></button><button onclick="edit(this)" class="btn btn-warning" type="button" ><span class="glyphicon glyphicon-edit"></span></button>'
             },
             ],
             "order": [[1, 'asc']],
-            bAutoWidth: false,                   //是否启用自动适应列宽
+            bAutoWidth: false   ,                   //是否启用自动适应列宽
             paging: true,//分页
             pagingType: "full_numbers",//分页样式的类型
             //"order": [[ 1, 'asc' ]],
@@ -119,9 +138,7 @@
             }
         });
         $("#table_local_filter input[type=search]").css({ width: "auto" });//右上角的默认搜索文本框，不写这个就超出去了。
-
     });
-
     function format(d) {
         var width = $("#table_local").innerWidth()
         var iframewidth = parseInt(width) / 2 - 16;//padding有8*2的宽度
@@ -138,9 +155,28 @@
 
         return result
     }
-
+    function download(obj,isanswer) {
+        var curWwwPath = window.document.location.href;    //获取当前url
+        var pathName = window.document.location.pathname;
+        var pos = curWwwPath.indexOf(pathName);
+        var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
+        var id = $(obj).parent().parent().children("td").eq(1).text()
+        var course = $(obj).parent().parent().children("td").eq(3).text()
+        var section = $(obj).parent().parent().children("td").eq(5).text()
+        var type = $(obj).parent().parent().children("td").eq(7).text()
+        var difficulty = $(obj).parent().parent().children("td").eq(9).text()
+        console.log(localhostPath)
+        if (isanswer == 0) {
+            localhostPath += "Upload/" + course + "/" + section + "/" + type + "/" + difficulty + "/" + id + ".docx"
+        }
+        else {
+            localhostPath += "Upload/" + course + "/" + section + "/" + type + "/" + difficulty + "/" + id + "_answer.docx"
+        }
+        window.location.href=localhostPath
+        console.log(localhostPath)
+    }
     function Del(obj) {
-        var id = parseInt($(obj).parent().attr("id"))
+        var id = parseInt($(obj).parent().parent().children("td").eq(1).text())
         alert(id)
         $.ajax({
             url: "/api/ViewQuestionAPI/DeleteQuestion/",
@@ -148,8 +184,7 @@
             contentType: 'application/json',
             data: JSON.stringify({ questionid: id }),
             beforeSend: function () {
-                //$("#submit").val("正在登录中")
-                //$("#submit").attr("disabled", "disabled")
+
             },
             success: function (result) {
                 if (result == true) {
@@ -163,7 +198,6 @@
         })
         //$(obj).parent().parent().remove()
     }
-
     function getAttarchmentPath(d) {
         var curWwwPath = window.document.location.href;
         var pathName = window.document.location.pathname;
@@ -172,7 +206,6 @@
         var str = localhostPaht + '/Upload' + '/' + d.Course.toString() + '/' + d.Section.toString() + '/' + d.Type.toString() + '/' + d.Difficulty.toString()
         return str
     }
-
     function verifyurl(url) {
         var res = ""
         $.ajax({
@@ -182,7 +215,6 @@
             data: "",
             error: function (XMLHttpRequest, textStatus) {
                 if (XMLHttpRequest.status == 404) {
-                    console.log(11111111)
                     res = "not found"
                 }
                 else {
@@ -191,5 +223,116 @@
             }
         });
         return res
+    }
+    jQuery(function () {
+        var $ = jQuery,
+            $list = $('#thelist'),
+            $btn = $('#ctlBtn'),
+            state = 'pending',
+            uploader;
+
+        uploader = WebUploader.create({
+            //是否自动上传
+            auto: true,
+            // 不压缩image
+            resize: false,
+            multiple: false,
+            threads: 1,
+            // swf文件路径
+            swf: 'Content/webuploader/Uploader.swf',
+
+            // 文件接收服务端。
+            server: '/ViewQuestion/UpLoadProcess',
+            timeout: 0,
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#picker',
+            //验证上传文件的类型
+            accept: {
+                title: 'Documents',
+                extensions: 'doc,docx,,'
+            }
+        });
+        uploader.on("error", function (type) {
+            if (type == "Q_TYPE_DENIED") {
+                alert("ERROR")
+            }
+        });
+        // 当有文件添加进来的时候
+        uploader.on('fileQueued', function (file) {
+            $list.append('<div id="' + file.id + '" class="item">' +
+                '<h4 class="info">' + file.name + '<span class="glyphicon glyphicon-remove" ></span></h4>' +
+                //'<span class="glyphicon glyphicon-remove"></span>' +
+                '<p class="state">等待上传...</p>' +
+            '</div>');
+            console.log(this)
+        });
+        // 文件上传过程中创建进度条实时显示。
+        uploader.on('uploadProgress', function (file, percentage) {
+            var $li = $('#' + file.id),
+                $percent = $li.find('.progress .progress-bar');
+
+            // 避免重复创建
+            if (!$percent.length) {
+                $percent = $('<div class="progress progress-striped active">' +
+                  '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+                  '</div>' +
+                '</div>').appendTo($li).find('.progress-bar');
+            }
+
+            $li.find('p.state').text('上传中');
+
+            $percent.css('width', percentage * 100 + '%');
+        });
+
+        uploader.on('uploadSuccess', function (file) {
+            $('#' + file.id).find('p.state').text('已上传');
+            alert("修改成功")
+        });
+
+        uploader.on('uploadError', function (file, reason) {
+            $('#' + file.id).find('p.state').text('上传出错' + reason);
+            alert("修改失败")
+        });
+        uploader.on('uploadComplete', function (file) {
+            //window.location.reload()
+        });
+
+        uploader.on('all', function (type) {
+            if (type === 'startUpload') {
+                state = 'uploading';
+            } else if (type === 'stopUpload') {
+                state = 'paused';
+            } else if (type === 'uploadFinished') {
+                state = 'done';
+            }
+
+            if (state === 'uploading') {
+                $btn.text('暂停上传');
+            } else {
+                $btn.text('开始上传');
+            }
+        });
+
+        $btn.on('click', function (file) {
+            var course = $("#course").val();
+            var questiontype = $("#questiontype").val();
+            var section = $("#section").val();
+            var difficulty = $("#difficulty").val();
+            if (course == 0 || questiontype == 0 || section == 0 || difficulty == 0) {
+                alert("请选择课程，题型，章节，难度");
+                return;
+            }
+            uploader.options.formData = { "course": course, "questiontype": questiontype, "section": section, "difficulty": difficulty };
+            if (state === 'uploading') {
+                uploader.stop();
+            } else {
+                uploader.upload();
+            }
+        });
+    });
+    function edit(obj) {
+        $("#picker").find("input").click()
     }
 </script>
