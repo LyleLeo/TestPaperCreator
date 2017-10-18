@@ -216,6 +216,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Files\TestPaperBody.dotx" />
     <Content Include="Files\TestPaperHead.dotx" />
+    <None Include="Properties\PublishProfiles\desktop.pubxml" />
     <None Include="Properties\PublishProfiles\surface.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
