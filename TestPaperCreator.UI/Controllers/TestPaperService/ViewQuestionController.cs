@@ -64,10 +64,9 @@ namespace TestPaperCreator.Controllers.TestPaperService
         {
             return View();
         }
-        public ActionResult UpLoadProcess(string id, string name, string type, string lastModifiedDate, int size, int course, int questiontype, int section, int difficulty, HttpPostedFileBase file)
+        public ActionResult UpLoadProcess(string id, string name, string type, string lastModifiedDate, int? size,int questionid, int course, int questiontype, int section, int difficulty, HttpPostedFileBase file)
         {
             string filePathName = string.Empty;
-
             string localPath = Path.Combine(HttpRuntime.AppDomainAppPath, "Upload");
             string path = "\\" + course.ToString() + "\\" + section.ToString() + "\\" + questiontype.ToString() + "\\" + difficulty.ToString() + "\\";
             localPath += path;
@@ -76,7 +75,6 @@ namespace TestPaperCreator.Controllers.TestPaperService
                 return Json(new { jsonrpc = 2.0, error = new { code = 102, message = "保存失败" }, id = "id" });
             }
             string ex = Path.GetExtension(file.FileName);
-            //filePathName = Guid.NewGuid().ToString("N") + ex;
             if (!Directory.Exists(localPath))
             {
                 Directory.CreateDirectory(localPath);
@@ -87,6 +85,7 @@ namespace TestPaperCreator.Controllers.TestPaperService
             question.Section = section;
             question.Difficulty = difficulty;
             question.Course = course;
+            question.ID = questionid;
             if (name.ToLower().EndsWith(".doc"))
             {
                 BLL.OfficeHelper.WordDocumentMerger.ConvertDocToDocx(localPath + name);

@@ -187,13 +187,21 @@ namespace TestPaperCreator.BLL.Utility
         /// <param name="maxid">当前数据库中题目最大ID</param>
         public static void SplitDocx(string file, string name, MODEL.TestPaper.Question question)
         {
-            //获取数据库中最大ID
-            int maxid = DAL.TestPaperService.TestPaperService.GetMaxQuestionID();
+            int maxid;
+            if (question.ID == 0)
+            {
+                //获取数据库中最大ID
+                maxid = DAL.TestPaperService.TestPaperService.GetMaxQuestionID();
+                maxid += 1;//从最大ID+1开始新增题目
+            }
+            else
+            {
+                maxid = question.ID;
+            }
             WordprocessingDocument wordprocessingDocument = WordprocessingDocument.Open(file + name, true);
             Body body = wordprocessingDocument.MainDocumentPart.Document.Body;
             int flag = 0;//标记当前段落是问题还是答案，偶数为问题，奇数为答案，从偶数开始。
             bool documentisend = true;//标记一个文档是否插入完成
-            maxid += 1;//从最大ID+1开始新增题目
             StringBuilder sb = new StringBuilder();//内容容器
             List<string> imgridlist = new List<string>();
             List<string> objridlist = new List<string>();
@@ -220,7 +228,18 @@ namespace TestPaperCreator.BLL.Utility
                         {
                             throw e;
                         }
-                        DAL.TestPaperService.TestPaperService.InsertQuestion(question.Course, question.Type, question.Section, question.Difficulty, sb.ToString().Trim(), maxid);
+                        if(question.ID == 0)
+                        {
+                            DAL.TestPaperService.TestPaperService.InsertQuestion(question.Course, question.Type, question.Section, question.Difficulty, sb.ToString().Trim(), maxid);
+                        }
+                        else
+                        {
+                            List<string> condition = new List<string>();
+                            condition.Add("Content");
+                            condition.Add(sb.ToString().Trim());
+                            DAL.TestPaperService.TestPaperService.UpdateQuestion(maxid, condition);
+                        }
+                        
                         sb.Length = 0;//清空stringbuilder
                         continue;
                     }

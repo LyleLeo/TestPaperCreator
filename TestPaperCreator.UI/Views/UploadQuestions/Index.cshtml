@@ -100,15 +100,15 @@
                 //'<span class="glyphicon glyphicon-remove"></span>' +
                 '<p class="state">等待上传...</p>' +
             '</div>');
-            var course = $("#course").val();
-            var questiontype = $("#questiontype").val();
-            var section = $("#section").val();
-            var difficulty = $("#difficulty").val();
-            if (course == 0 || questiontype == 0 || section == 0 || difficulty == 0) {
-                alert("请选择课程，题型，章节，难度");
-                return;
-            }
-            uploader.options.formData = { "course": course, "questiontype": questiontype, "section": section, "difficulty": difficulty };
+            //var course = $("#course").val();
+            //var questiontype = $("#questiontype").val();
+            //var section = $("#section").val();
+            //var difficulty = $("#difficulty").val();
+            //if (course == 0 || questiontype == 0 || section == 0 || difficulty == 0) {
+            //    alert("请选择课程，题型，章节，难度");
+            //    return;
+            //}
+            //uploader.options.formData = { "course": course, "questiontype": questiontype, "section": section, "difficulty": difficulty };
         });
         // 文件上传过程中创建进度条实时显示。
         uploader.on('uploadProgress', function (file, percentage) {

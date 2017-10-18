@@ -4,7 +4,6 @@
 }
 
 <select style="display:none" id="section_detail" class="form-control">
-    <option selected value="0">选择章节</option>
     @foreach (var i in ViewBag.SectionList)
     {
         <option value="@i.id">@i.value</option>
@@ -12,7 +11,6 @@
 </select>
 
 <select style="display:none" id="difficulty_detail" class="form-control">
-    <option selected value="0">选择难度</option>
     @foreach (var i in ViewBag.DifficultyList)
     {
         <option value="@i.id">@i.value</option>
@@ -53,7 +51,6 @@
             <div class="col-lg-2 form-group">
                 专业名称：
                 <select id="final_majorname" disabled="disabled" class="form-control">
-                    <option selected="" value="0">选择专业</option>
                     @foreach (var i in ViewBag.Majorlist)
                     {
                         <option value="@i.id">@i.value</option>
@@ -74,7 +71,6 @@
         <div class="row" style="color:black">
             <div class="col-lg-2 form-group">
                 课程名称：<select disabled="disabled" id="final_course" class="form-control">
-                    <option selected value="0">选择课程</option>
                     @foreach (var i in ViewBag.CourseList)
                     {
                         <option value="@i.id">@i.value</option>
@@ -83,7 +79,7 @@
 
             </div>
             <div class="col-lg-2 form-group">
-                分卷：<input id="final_volume" placeholder="例：A、B" class="form-control" type="text" />
+                分卷：<input disabled="disabled" id="final_volume" placeholder="例：A、B" class="form-control" type="text" />
             </div>
             <div class="col-lg-2 form-group">
                 考试时长(分钟)：<input id="final_length" placeholder="例：120、90" class="form-control" type="text" />
@@ -118,7 +114,6 @@
             <div class="col-lg-2 form-group">
                 专业名称：
                 <select id="majorname" class="form-control">
-                    <option selected="" value="0">选择专业</option>
                     @foreach (var i in ViewBag.Majorlist)
                     {
                         <option value="@i.id">@i.value</option>
@@ -138,7 +133,6 @@
         <div class="row" style="color:black">
             <div class="col-lg-2 form-group">
                 课程名称：<select id="course" class="form-control">
-                    <option selected value="0">选择课程</option>
                     @foreach (var i in ViewBag.CourseList)
                     {
                         <option value="@i.id">@i.value</option>
@@ -147,7 +141,7 @@
 
             </div>
             <div class="col-lg-2 form-group">
-                分卷：<input id="volume" placeholder="例：A、B" class="form-control" type="text" value="@ViewBag.Property["volume"]" />
+                分卷：<input disabled="disabled" id="volume" placeholder="例：A、B" class="form-control" type="text" value="@ViewBag.Property["volume"]" />
             </div>
             <div class="col-lg-2 form-group">
                 考试时长(分钟)：<input id="length" placeholder="例：120、90" class="form-control" type="text" value="@ViewBag.Property["length"]" />
@@ -166,7 +160,6 @@
         <div class="row" style="color:black">
             <div class="col-md-2 form-group">
                 题型：<select id="questiontype" class="form-control">
-                    <option selected value="0">选择题型</option>
                     @foreach (var i in ViewBag.QuestionTypeList)
                     {
                         <option value="@i.id">@i.value</option>

@@ -150,7 +150,7 @@
         }
         else {
             var result = '<tr><th style="width:' + iframewidth + 'px" >题干</th><th style="width:' + iframewidth + 'px" >答案</th></tr><tr><td style="width:' + iframewidth + 'px"><iframe id="' + iframepageid + '" frameborder="1" scrolling="no" marginheight="0" width="' + iframewidth + '" height="200" marginwidth="0" src="' + str + d.ID.toString() + '.html"></iframe></td>' +
-            '<td style="width:' + iframewidth + 'px"><iframe id="' + iframepageid + '_answer" frameborder="1" scrolling="no" marginheight="0" height="200" width = "' + iframewidth + '" marginwidth="0" src="' + str + d.ID.toString() + '_answer.html"></iframe></td></tr>';
+            '<td style="width:' + iframewidth + 'px"><iframe id="' + iframepageid + '_answer" frameborder="1" scrolling="no" marginheight="0" height="200" width = "' + iframewidth + '" marginwidth="0" src="' + str + d.ID.toString() + '_answer.html?new=' + Math.random() + '"></iframe></td></tr>';
         }
 
         return result
@@ -261,12 +261,18 @@
         });
         // 当有文件添加进来的时候
         uploader.on('fileQueued', function (file) {
+            alert("正在上传文件，请稍后")
             $list.append('<div id="' + file.id + '" class="item">' +
                 '<h4 class="info">' + file.name + '<span class="glyphicon glyphicon-remove" ></span></h4>' +
                 //'<span class="glyphicon glyphicon-remove"></span>' +
                 '<p class="state">等待上传...</p>' +
             '</div>');
-            console.log(this)
+            var questionid = $("#edit").children("td").eq(1).text()
+            var course = $("#edit").children("td").eq(3).text()
+            var questiontype = $("#edit").children("td").eq(5).text()
+            var section = $("#edit").children("td").eq(7).text()
+            var difficulty = $("#edit").children("td").eq(9).text()
+            uploader.options.formData = { "questionid": questionid, "course": course, "questiontype": questiontype, "section": section, "difficulty": difficulty };
         });
         // 文件上传过程中创建进度条实时显示。
         uploader.on('uploadProgress', function (file, percentage) {
@@ -296,7 +302,7 @@
             alert("修改失败")
         });
         uploader.on('uploadComplete', function (file) {
-            //window.location.reload()
+            window.location.reload()
         });
 
         uploader.on('all', function (type) {
@@ -333,6 +339,7 @@
         });
     });
     function edit(obj) {
+        $(obj).parent().parent().attr("id","edit")
         $("#picker").find("input").click()
     }
 </script>

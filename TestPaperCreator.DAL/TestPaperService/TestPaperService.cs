@@ -582,5 +582,18 @@ namespace TestPaperCreator.DAL.TestPaperService
             sql = sql.Remove(sql.Length - 1,1);
         }
         #endregion
+
+        #region 修改试题
+        /// <summary>
+        /// 修改试题
+        /// </summary>
+        /// <param name="questionid">试题ID</param>
+        /// <param name="condition">修改字段和值的列表</param>
+        public static void UpdateQuestion(int questionid,List<string> condition)
+        {
+            string sql = "update Questions set " + condition[0] + " = '" + condition[1] + "' where id = " + questionid;
+            SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
+        }
+        #endregion
     }
 }
