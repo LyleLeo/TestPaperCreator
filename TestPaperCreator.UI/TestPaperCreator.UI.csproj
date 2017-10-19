@@ -921,35 +921,6 @@
     <Content Include="Upload\1\1\7\1\files\36.files\themedata.thmx" />
     <Content Include="Upload\1\1\7\1\files\36_answer.files\themedata.thmx" />
     <Content Include="Upload\1\1\7\1\计算题（1个）.docx" />
-    <Content Include="Upload\OUT\1.docx" />
-    <Content Include="Upload\OUT\1\6.docx" />
-    <Content Include="Upload\OUT\1\7.docx" />
-    <Content Include="Upload\OUT\1\8.docx" />
-    <Content Include="Upload\OUT\2.docx" />
-    <Content Include="Upload\OUT\2\10.docx" />
-    <Content Include="Upload\OUT\2\11.docx" />
-    <Content Include="Upload\OUT\2\12.docx" />
-    <Content Include="Upload\OUT\2\13.docx" />
-    <Content Include="Upload\OUT\2\9.docx" />
-    <Content Include="Upload\OUT\3.docx" />
-    <Content Include="Upload\OUT\3\14.docx" />
-    <Content Include="Upload\OUT\3\15.docx" />
-    <Content Include="Upload\OUT\3\16.docx" />
-    <Content Include="Upload\OUT\3\17.docx" />
-    <Content Include="Upload\OUT\4.docx" />
-    <Content Include="Upload\OUT\4\18.docx" />
-    <Content Include="Upload\OUT\4\19.docx" />
-    <Content Include="Upload\OUT\4\20.docx" />
-    <Content Include="Upload\OUT\4\21.docx" />
-    <Content Include="Upload\OUT\4\22.docx" />
-    <Content Include="Upload\OUT\4\23.docx" />
-    <Content Include="Upload\OUT\4\24.docx" />
-    <Content Include="Upload\OUT\4\25.docx" />
-    <Content Include="Upload\OUT\5.docx" />
-    <Content Include="Upload\OUT\5\26.docx" />
-    <Content Include="Upload\OUT\final\24749e1c-d3af-48e8-8c0b-95a9eea83702.docx" />
-    <Content Include="Upload\OUT\TestPaperBody.dotx" />
-    <Content Include="Upload\OUT\TestPaperHead.dotx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
