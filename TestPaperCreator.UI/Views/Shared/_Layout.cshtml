@@ -29,12 +29,12 @@
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">试卷生成系统</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
                 <a href="/Home/Index" class="navbar-brand"><strong>试卷生成器</strong></a>
-
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -44,7 +44,7 @@
                     <li><a href="/ViewQuestion/Index"><strong>管理试题</strong></a></li>
                     <li><a href="/Manage/Index"><strong>系统管理</strong></a></li>
                 </ul>
-                <ul class="nav navbar-nav" style="float:right">
+                <ul class="nav navbar-nav navbar-right hidden-sm">
                     @if (ViewBag.IsLogin == true)
                     {
                         <li>
@@ -71,7 +71,6 @@
                         </li>
                     }
                 </ul>
-
             </div>
         </div>
     </div>
@@ -87,7 +86,12 @@
 </body>
 </html>
 <script type="text/javascript">
+    
     $(document).ready(function () {
+        var bodyheight = parseInt(window.screen.height) - 200
+        $("body").attr("style", "height:" + bodyheight.toString() + "px;background-image:url(/images/banner.png)")
         $("#username").focus()
+        var padding = bodyheight/2-200
+        $(".col-md-4").attr("style", "padding-top:" + padding + "px")
     })
 </script>
