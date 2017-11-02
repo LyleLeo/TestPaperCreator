@@ -3,14 +3,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<select style="display:none" id="section_detail" class="form-control">
+<select style="display:none" id="section_detail" onchange="GetMaxQuestionCount(this)" class="form-control">
     @foreach (var i in ViewBag.SectionList)
     {
         <option value="@i.id">@i.value</option>
     }
 </select>
 
-<select style="display:none" id="difficulty_detail" class="form-control">
+<select style="display:none" onchange="GetMaxQuestionCount(this)" id="difficulty_detail" class="form-control">
     @foreach (var i in ViewBag.DifficultyList)
     {
         <option value="@i.id">@i.value</option>
@@ -200,6 +200,28 @@
 </div>
 
 <script type="text/javascript">
+    function GetMaxQuestionCount(obj) {
+        var course = $(obj).parent().parent().find("select").eq(0).val();
+        var questiontype = $(obj).parent().parent().find("select").eq(1).val();
+        var section = $(obj).parent().parent().find("select").eq(2).val();
+        var difficulty = $(obj).parent().parent().find("select").eq(3).val();
+        var data = {
+            course: course,
+            questiontype: questiontype,
+            section: section,
+            difficulty: difficulty
+        }
+        $.ajax({
+            url: "/api/DownloadTestPaperAPI/GetMaxCount/",
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify(data),            
+            success: function (result) {
+              console.log(result)  
+            },
+        })
+        console.log(section)
+    }
     function Generate() {
         var schoolname = $("#final_schoolname").val()
         var collegename = $("#final_collegename").val()

@@ -9,6 +9,10 @@ namespace TestPaperCreator.BLL.TestPaperService
 {
     public class TestPaperService
     {
+        public static Dictionary<int, string> GetMaxCount(int course, int questiontype, int section, int difficulty)
+        {
+            return DAL.TestPaperService.TestPaperService.GetMaxCount(course, questiontype, section, difficulty);
+        }
         public static IDictionary<string, string> GetProperty()
         {
             return DAL.TestPaperService.TestPaperService.GetProperty();

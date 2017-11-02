@@ -82,6 +82,7 @@ namespace TestPaperCreator.DAL.TestPaperService
         }
         #endregion
 
+        #region 插入专业
         public static void InsertMajor(int majorid)
         {
             string sql = "insert into Major_Question (MajorID,QuestionID,Weight) values ";
@@ -94,11 +95,15 @@ namespace TestPaperCreator.DAL.TestPaperService
             sql = sql.Substring(0, sql.Length - 1);
             SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
         }
+        #endregion
+
+        #region 删除专业
         public static void DeleteMajor(int majorid)
         {
             string sql = "delete from Major_Question where MajorID = " + majorid;
             SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
         }
+        #endregion
 
         #region 查询课程
         public static List<MODEL.TestPaper.Condition> GetCourse()
@@ -595,5 +600,22 @@ namespace TestPaperCreator.DAL.TestPaperService
             SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
         }
         #endregion
+
+        public static Dictionary<int, string> GetMaxCount(int course, int questiontype, int section, int difficulty)
+        {
+            string sql = "select count(id) from questions where course = " + course + "and section = " + section + "and type = " + questiontype + "and difficulty = " + difficulty + " where flag = 1";
+            int count = (int)SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
+            Dictionary<int, string> result = new Dictionary<int, string>();
+            result.Add(5, count.ToString());
+            string coursename = GetConditionNameByConditionID(course, "Course");
+            string difficultyname = GetConditionNameByConditionID(difficulty, "Difficulty");
+            string sectionname = GetConditionNameByConditionID(section, "Section");
+            string questiontypename = GetConditionNameByConditionID(questiontype, "Type");
+            result.Add(1, coursename);
+            result.Add(2, questiontypename);
+            result.Add(3, sectionname);
+            result.Add(4, difficultyname);
+            return result;
+        }
     }
 }

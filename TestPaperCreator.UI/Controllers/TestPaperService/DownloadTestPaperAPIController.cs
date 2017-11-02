@@ -177,6 +177,15 @@ namespace TestPaperCreator.Controllers.TestPaperService
             return "success";
         }
         #endregion
+
+        #region 获取最大试题数
+        [HttpPost]
+        public static Dictionary<int, string> GetMaxCount(dynamic obj)
+        {
+            //return GetMaxCount(course, questiontype, section, difficulty);
+            return new Dictionary<int, string>();
+        }
+        #endregion
     }
 
     class DaTi
