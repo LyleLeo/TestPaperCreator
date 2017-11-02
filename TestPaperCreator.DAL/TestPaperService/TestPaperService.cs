@@ -603,7 +603,7 @@ namespace TestPaperCreator.DAL.TestPaperService
 
         public static Dictionary<int, string> GetMaxCount(int course, int questiontype, int section, int difficulty)
         {
-            string sql = "select count(id) from questions where course = " + course + "and section = " + section + "and type = " + questiontype + "and difficulty = " + difficulty + " where flag = 1";
+            string sql = "select count(id) from questions where course = " + course + "and section = " + section + "and type = " + questiontype + "and difficulty = " + difficulty + " and flag = 1";
             int count = (int)SqlHelper.ExecuteScalar(conn, CommandType.Text, sql);
             Dictionary<int, string> result = new Dictionary<int, string>();
             result.Add(5, count.ToString());

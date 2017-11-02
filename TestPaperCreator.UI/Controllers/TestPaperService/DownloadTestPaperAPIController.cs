@@ -9,6 +9,21 @@ namespace TestPaperCreator.Controllers.TestPaperService
 {
     public class DownloadTestPaperAPIController : ApiController
     {
+        #region 获取最大试题数
+        [HttpPost]
+        [Route("api/DownloadTestPaperAPI/DeleteMaxCount/")]
+        public Dictionary<int, string> DeleteMaxCount(dynamic obj)
+        {
+            int course = Convert.ToInt32(obj[0]);
+            int questiontype = Convert.ToInt32(obj[1]);
+            int section = Convert.ToInt32(obj[2]);
+            int difficulty = Convert.ToInt32(obj[3]);
+            return BLL.TestPaperService.TestPaperService.GetMaxCount(course, questiontype, section, difficulty);
+            //List<int> list = new List<int>();
+            //return list;
+        }
+        #endregion
+
         #region 获取符合条件的试题
         [HttpPost]
         [Route("api/DownloadTestPaperAPI/GetQuestionID/")]
@@ -178,14 +193,7 @@ namespace TestPaperCreator.Controllers.TestPaperService
         }
         #endregion
 
-        #region 获取最大试题数
-        [HttpPost]
-        public static Dictionary<int, string> GetMaxCount(dynamic obj)
-        {
-            //return GetMaxCount(course, questiontype, section, difficulty);
-            return new Dictionary<int, string>();
-        }
-        #endregion
+        
     }
 
     class DaTi
@@ -193,5 +201,11 @@ namespace TestPaperCreator.Controllers.TestPaperService
         string tihao { get; set; }
         MODEL.TestPaper.SingleDaTi singledati { get; set; }
     }
-
+    public class ConditionList
+    {
+        int course { get; set; }
+        int questiontype { get; set; }
+        int section { get; set; }
+        int difficulty { get; set; }
+    }
 }

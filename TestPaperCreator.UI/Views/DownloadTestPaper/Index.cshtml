@@ -205,6 +205,7 @@
         var questiontype = $(obj).parent().parent().find("select").eq(1).val();
         var section = $(obj).parent().parent().find("select").eq(2).val();
         var difficulty = $(obj).parent().parent().find("select").eq(3).val();
+        var conditionlist = [course,questiontype,section,difficulty]
         var data = {
             course: course,
             questiontype: questiontype,
@@ -212,15 +213,14 @@
             difficulty: difficulty
         }
         $.ajax({
-            url: "/api/DownloadTestPaperAPI/GetMaxCount/",
+            url: "/api/DownloadTestPaperAPI/DeleteMaxCount/",
             type: "POST",
-            contentType: 'application/json',
-            data: JSON.stringify(data),            
+            data: { "": conditionlist},
             success: function (result) {
-              console.log(result)  
+                console.log(result)
+                $(obj).parent().parent().parent().children("table").eq(0).after("<label>"+result[1]+"</label>")
             },
         })
-        console.log(section)
     }
     function Generate() {
         var schoolname = $("#final_schoolname").val()
