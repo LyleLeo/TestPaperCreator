@@ -218,7 +218,7 @@
             data: { "": conditionlist},
             success: function (result) {
                 console.log(result)
-                $(obj).parent().parent().parent().children("table").eq(0).after("<label>"+result[1]+"</label>")
+                $(obj).parent().parent().parent().children("label").eq(0).html(result[1] + "，" + result[2] + "，" + result[3] + "，" + result[4] + " 下的AB卷一共可选题量为：" + result[5] )
             },
         })
     }
@@ -487,7 +487,7 @@
     '难度：' + difficultyselect +
 '</div>' +
 '<div class="col-lg-2 form-group">' +
-    '数量：<input id="totalscore" onfocus="this.select()" placeholder="请填写数量" class="form-control" type="text" />' +
+    '数量：<input id="totalscore" onkeyup="GetMaxQuestionCount(this)" onfocus="this.select()" placeholder="请填写数量" class="form-control" type="text" />' +
 '</div>' +
 '<div class="col-lg-1 form-group">' +
     '&nbsp<button id="AddOn" onclick="Add_Details(this,' + questioncount + ')" class="btn btn-primary form-control" type="button">添加</button>' +
@@ -507,6 +507,7 @@
 '</thead>' +
 '<tbody id="Detail_Content_' + questiontypeid + '"></tbody>' +
 '</table>' +
+'<label></label>'+
 '</div>' +
 '<div class="panel-footer">' +
 '<button onclick="Pre_Step(this)" id="prestep_' + prestep + '" class="btn btn-sm btn-success">上一步</button>' +
