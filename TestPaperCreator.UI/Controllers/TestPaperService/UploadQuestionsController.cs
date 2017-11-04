@@ -55,10 +55,10 @@ namespace TestPaperCreator.Controllers.TestPaperService
                     Response.Redirect("/Membership/login");
                 }
             }
-            List<MODEL.TestPaper.Condition> courselist = BLL.TestPaperService.TestPaperService.GetCourse();
-            List<MODEL.TestPaper.Condition> difficultylist = BLL.TestPaperService.TestPaperService.GetDifficulty();
-            List<MODEL.TestPaper.Condition> sectionlist = BLL.TestPaperService.TestPaperService.GetSection();
-            List<MODEL.TestPaper.Condition> questiontype = BLL.TestPaperService.TestPaperService.GetQuestionType();
+            List<MODEL.TestPaper.Condition> courselist = BLL.TestPaperService.TestPaperService.GetCourse(1);
+            List<MODEL.TestPaper.Condition> difficultylist = BLL.TestPaperService.TestPaperService.GetDifficulty(1);
+            List<MODEL.TestPaper.Condition> sectionlist = BLL.TestPaperService.TestPaperService.GetSection(1);
+            List<MODEL.TestPaper.Condition> questiontype = BLL.TestPaperService.TestPaperService.GetQuestionType(1);
             ViewBag.CourseList = courselist;
             ViewBag.DifficultyList = difficultylist;
             ViewBag.SectionList = sectionlist;

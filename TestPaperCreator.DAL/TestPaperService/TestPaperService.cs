@@ -106,10 +106,18 @@ namespace TestPaperCreator.DAL.TestPaperService
         #endregion
 
         #region 查询课程
-        public static List<MODEL.TestPaper.Condition> GetCourse()
+        public static List<MODEL.TestPaper.Condition> GetCourse(int flag)
         {
             List<MODEL.TestPaper.Condition> courselist = new List<MODEL.TestPaper.Condition>();
-            string sql = "select ID, Value from Course where Flag = 1";
+            string sql;
+            if(flag == 1)
+            {
+                sql = "select ID, Value from Course where Flag = " + flag;
+            }
+            else
+            {
+                sql = "select ID, Value from Course";
+            }
             DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
@@ -123,10 +131,18 @@ namespace TestPaperCreator.DAL.TestPaperService
         #endregion
 
         #region 查询难度
-        public static List<MODEL.TestPaper.Condition> GetDifficulty()
+        public static List<MODEL.TestPaper.Condition> GetDifficulty(int flag)
         {
             List<MODEL.TestPaper.Condition> difficultylist = new List<MODEL.TestPaper.Condition>();
-            string sql = "select ID, Value from Difficulty where Flag = 1";
+            string sql;
+            if(flag == 1)
+            {
+                sql = "select ID, Value from Difficulty where Flag = " + flag;
+            }
+            else
+            {
+                sql = "select ID, Value from Difficulty";
+            }
             DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
@@ -140,11 +156,18 @@ namespace TestPaperCreator.DAL.TestPaperService
         #endregion
 
         #region 查询章节
-        public static List<MODEL.TestPaper.Condition> GetSection()
+        public static List<MODEL.TestPaper.Condition> GetSection(int flag)
         {
             List<MODEL.TestPaper.Condition> sectionlist = new List<MODEL.TestPaper.Condition>();
-
-            string sql = "select ID, Value from Section where Flag = 1";
+            string sql;
+            if(flag == 1)
+            {
+                sql = "select ID, Value from Section where Flag = " + flag;
+            }
+            else
+            {
+                sql = "select ID, Value from Section";
+            }
             DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
@@ -158,10 +181,18 @@ namespace TestPaperCreator.DAL.TestPaperService
         #endregion
 
         #region 查询题型
-        public static List<MODEL.TestPaper.Condition> GetQuestionType()
+        public static List<MODEL.TestPaper.Condition> GetQuestionType(int flag)
         {
             List<MODEL.TestPaper.Condition> typelist = new List<MODEL.TestPaper.Condition>();
-            string sql = "select ID, Value from Type where Flag = 1";
+            string sql;
+            if(flag == 1)
+            {
+                sql = "select ID, Value from Type where Flag = " + flag;
+            }
+            else
+            {
+                sql = "select ID, Value from Type";
+            }
             DataSet ds = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
             foreach (DataRow dr in ds.Tables[0].Rows)
             {

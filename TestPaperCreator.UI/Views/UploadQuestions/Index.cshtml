@@ -48,13 +48,33 @@
     <div class="btns">
         <div id="picker">选择文件</div>
         <button id="ctlBtn" class="btn btn-default">开始上传</button>
-
+        <button id="convert" class="btn btn-default" onclick="convert()">转换格式</button>
     </div>
 </div>
 
 <script src="../Scripts/jquery-1.10.2.min.js"></script>
 <script src="../Content/webuploader/webuploader.js"></script>
 <script type="text/javascript">
+    function convert() {
+        var curWwwPath = window.document.location.href;    //获取当前url
+        var pathName = window.document.location.pathname;
+        var pos = curWwwPath.indexOf(pathName);
+        var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
+        localhostPath = localhostPath + "Upload/"
+        console.log(localhostPath)
+        $.ajax({
+            url: "/api/UploadQuestionsAPI/ConverDocxToHtml/",
+            type: "POST",
+            data: { "": localhostPath },
+            beforeSend:function(){
+                $("#convert").text("正在转换中")
+            },
+            success: function () {
+                console.log("asf")
+                $("#convert").text("转换成功")
+            },
+        })
+    }
     // 文件上传
     jQuery(function () {
         var $ = jQuery,
@@ -83,7 +103,7 @@
             //验证上传文件的类型
             accept: {
                 title: 'Documents',
-                extensions: 'doc,docx,,'
+                extensions: 'docx,,'
             }
         });
         console.log(111111)

@@ -220,14 +220,14 @@ namespace TestPaperCreator.BLL.Utility
                         objridlist = new List<string>();
                         documentisend = true;
                         flag++;
-                        try
-                        {
-                            OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + ".docx");
-                        }
-                        catch (Exception e)
-                        {
-                            throw e;
-                        }
+                        //try
+                        //{
+                        //    OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + ".docx");
+                        //}
+                        //catch (Exception e)
+                        //{
+                        //    throw e;
+                        //}
                         if(question.ID == 0)
                         {
                             DAL.TestPaperService.TestPaperService.InsertQuestion(question.Course, question.Type, question.Section, question.Difficulty, sb.ToString().Trim(), maxid);
@@ -266,7 +266,7 @@ namespace TestPaperCreator.BLL.Utility
                         objridlist = new List<string>();
                         documentisend = true;
                         flag++;
-                        OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + "_answer.docx");
+                        //OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + "_answer.docx");
                         maxid++;
                         continue;
                     }
@@ -274,6 +274,7 @@ namespace TestPaperCreator.BLL.Utility
                 }
             }
             wordprocessingDocument.Close();
+            File.Delete(file + name);
         }
         #endregion
 
@@ -828,6 +829,63 @@ namespace TestPaperCreator.BLL.Utility
             MergeDatiToPaper(paperhead, strCopyFolder, paperproperty, isanswer);
         }
         #endregion
+
+        public static void ConverDocxToHtml(string path)
+        {
+            List<string> pathlist = new List<string>();
+            List<MODEL.TestPaper.Condition> courselist = DAL.TestPaperService.TestPaperService.GetCourse(0);
+            List<MODEL.TestPaper.Condition> sectionlist = DAL.TestPaperService.TestPaperService.GetSection(0);
+            List<MODEL.TestPaper.Condition> questiontypelist = DAL.TestPaperService.TestPaperService.GetSection(0);
+            List<MODEL.TestPaper.Condition> difficultylist = DAL.TestPaperService.TestPaperService.GetDifficulty(0);
+            foreach (MODEL.TestPaper.Condition c in courselist)
+            {
+                foreach (MODEL.TestPaper.Condition s in sectionlist)
+                {
+                    foreach (MODEL.TestPaper.Condition q in questiontypelist)
+                    {
+                        foreach (MODEL.TestPaper.Condition d in difficultylist)
+                        {
+                            pathlist.Add(path + @"\" + c.id.ToString() + @"\" + s.id.ToString() + @"\" + q.id.ToString() + @"\" + d.id.ToString() + @"\");
+                        }
+                    }
+                }
+            }
+            foreach (string p in pathlist)
+            {
+                if(Directory.Exists(p))
+                {
+                    string[] files = Directory.GetFiles(p);
+                    if (Directory.Exists(p + @"\files\"))
+                    {
+                        var htmlfiles = Directory.GetFiles(p + @"\files\");
+                        List<string> fileslist = new List<string>(files);
+                        List<string> newfileslist = new List<string>();
+                        foreach (string file in fileslist)
+                        {
+                            newfileslist.Add(System.IO.Path.GetFileNameWithoutExtension(file));
+                        }
+                        List<string> oldhtmlfileslist = new List<string>(htmlfiles);
+                        List<string> newhtmlfileslist = new List<string>();
+                        foreach (string htmlfile in oldhtmlfileslist)
+                        {
+                            newhtmlfileslist.Add(System.IO.Path.GetFileNameWithoutExtension(htmlfile));
+                        }
+                        List<string> ToBeConverted = newfileslist.Except(newhtmlfileslist).ToList();
+                        List<string> ToBeConvertedFile = new List<string>();
+                        foreach (string file in ToBeConverted)
+                        {
+                            ToBeConvertedFile.Add(p + file + ".docx");
+                        }
+                        foreach(string file in ToBeConvertedFile)
+                        {
+                            OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file);
+                        }
+                    }
+                }
+                
+                
+            }
+        }
     }
 
 }

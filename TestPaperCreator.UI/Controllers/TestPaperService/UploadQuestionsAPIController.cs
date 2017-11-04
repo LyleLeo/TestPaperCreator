@@ -33,11 +33,11 @@ namespace TestPaperCreator.Controllers.TestPaperService
             question.Section = section;
             question.Difficulty = difficulty;
             question.Course = course;
-            if (name.ToLower().EndsWith(".doc"))
-            {
-                BLL.OfficeHelper.WordDocumentMerger.ConvertDocToDocx(localPath + name);
-                name = name.Replace("doc", "docx");
-            }
+            //if (name.ToLower().EndsWith(".doc"))
+            //{
+            //    BLL.OfficeHelper.WordDocumentMerger.ConvertDocToDocx(localPath + name);
+            //    name = name.Replace("doc", "docx");
+            //}
             BLL.Utility.OpenXmlForOffice.SplitDocx(localPath, name, question);
             //清除问题内容中的问号
             BLL.TestPaperService.TestPaperService.ClearQuestionMark("?");
@@ -48,6 +48,14 @@ namespace TestPaperCreator.Controllers.TestPaperService
                 id = id,
                 filePath = "/Upload/" + name
             });
+        }
+        [HttpPost]
+        [Route("api/UploadQuestionsAPI/ConverDocxToHtml/")]
+        public IHttpActionResult ConverDocxToHtml(dynamic path)
+        {
+            string localPath = Path.Combine(HttpRuntime.AppDomainAppPath, "Upload");
+            BLL.Utility.OpenXmlForOffice.ConverDocxToHtml(localPath);
+            return Ok();
         }
     }
 }

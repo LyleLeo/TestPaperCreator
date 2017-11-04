@@ -218,7 +218,7 @@
             data: { "": conditionlist},
             success: function (result) {
                 console.log(result)
-                $(obj).parent().parent().parent().children("label").eq(0).html(result[1] + "，" + result[2] + "，" + result[3] + "，" + result[4] + " 下的AB卷一共可选题量为：" + result[5] )
+                $(obj).parent().parent().parent().children("label").eq(0).html(result[1] + "，" + result[2] + "，" + result[3] + "，" + result[4] + " 的AB卷一共可选题量为：" + result[5] )
             },
         })
     }
@@ -237,7 +237,6 @@
         var classnumber = $("#final_class").val()
         var total_count = $("#total_count").text().split("：")[1]
         var total_score = $("#total_score").text().split("：")[1]
-
         var tihao = 1
         var typelist = []
         $.each($("#Content").children("tr"), function (idx, obj) {

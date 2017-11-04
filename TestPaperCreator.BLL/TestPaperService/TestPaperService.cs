@@ -17,21 +17,21 @@ namespace TestPaperCreator.BLL.TestPaperService
         {
             return DAL.TestPaperService.TestPaperService.GetProperty();
         }
-        public static List<MODEL.TestPaper.Condition> GetCourse()
+        public static List<MODEL.TestPaper.Condition> GetCourse(int flag)
         {
-            return DAL.TestPaperService.TestPaperService.GetCourse();
+            return DAL.TestPaperService.TestPaperService.GetCourse(flag);
         }
-        public static List<MODEL.TestPaper.Condition> GetDifficulty()
+        public static List<MODEL.TestPaper.Condition> GetDifficulty(int flag)
         {
-            return DAL.TestPaperService.TestPaperService.GetDifficulty();
+            return DAL.TestPaperService.TestPaperService.GetDifficulty(flag);
         }
-        public static List<MODEL.TestPaper.Condition> GetSection()
+        public static List<MODEL.TestPaper.Condition> GetSection(int flag)
         {
-            return DAL.TestPaperService.TestPaperService.GetSection();
+            return DAL.TestPaperService.TestPaperService.GetSection(flag);
         }
-        public static List<MODEL.TestPaper.Condition> GetQuestionType()
+        public static List<MODEL.TestPaper.Condition> GetQuestionType(int flag)
         {
-            return DAL.TestPaperService.TestPaperService.GetQuestionType();
+            return DAL.TestPaperService.TestPaperService.GetQuestionType(flag);
         }
 
         public static List<MODEL.TestPaper.Question> GetQuestionList(int course, int section, int difficulty, int questiontype, string keyword)
