@@ -835,7 +835,7 @@ namespace TestPaperCreator.BLL.Utility
             List<string> pathlist = new List<string>();
             List<MODEL.TestPaper.Condition> courselist = DAL.TestPaperService.TestPaperService.GetCourse(0);
             List<MODEL.TestPaper.Condition> sectionlist = DAL.TestPaperService.TestPaperService.GetSection(0);
-            List<MODEL.TestPaper.Condition> questiontypelist = DAL.TestPaperService.TestPaperService.GetSection(0);
+            List<MODEL.TestPaper.Condition> questiontypelist = DAL.TestPaperService.TestPaperService.GetQuestionType(0);
             List<MODEL.TestPaper.Condition> difficultylist = DAL.TestPaperService.TestPaperService.GetDifficulty(0);
             foreach (MODEL.TestPaper.Condition c in courselist)
             {
@@ -858,6 +858,10 @@ namespace TestPaperCreator.BLL.Utility
                     if (Directory.Exists(p + @"\files\"))
                     {
                         var htmlfiles = Directory.GetFiles(p + @"\files\");
+                        if(htmlfiles.Count() == files.Count())
+                        {
+                            continue;
+                        }
                         List<string> fileslist = new List<string>(files);
                         List<string> newfileslist = new List<string>();
                         foreach (string file in fileslist)
@@ -877,6 +881,13 @@ namespace TestPaperCreator.BLL.Utility
                             ToBeConvertedFile.Add(p + file + ".docx");
                         }
                         foreach(string file in ToBeConvertedFile)
+                        {
+                            OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file);
+                        }
+                    }
+                    else
+                    {
+                        foreach (string file in files)
                         {
                             OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file);
                         }
