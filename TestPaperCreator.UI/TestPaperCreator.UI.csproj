@@ -629,6 +629,20 @@
     <Content Include="Upload\1\1\7\1\files\36_answer.files\filelist.xml" />
     <Content Include="Upload\1\1\7\1\files\36_answer.files\header.html" />
     <Content Include="Upload\1\1\7\1\files\36_answer.html" />
+    <Content Include="Upload\1\2\1\1\files\106.files\colorschememapping.xml" />
+    <Content Include="Upload\1\2\1\1\files\106.files\filelist.xml" />
+    <Content Include="Upload\1\2\1\1\files\106.files\header.html" />
+    <Content Include="Upload\1\2\1\1\files\106.files\image002.gif" />
+    <Content Include="Upload\1\2\1\1\files\106.html" />
+    <Content Include="Upload\1\2\1\2\files\106.files\colorschememapping.xml" />
+    <Content Include="Upload\1\2\1\2\files\106.files\filelist.xml" />
+    <Content Include="Upload\1\2\1\2\files\106.files\header.html" />
+    <Content Include="Upload\1\2\1\2\files\106.files\image002.gif" />
+    <Content Include="Upload\1\2\1\2\files\106.html" />
+    <Content Include="Upload\1\2\2\1\files\106.files\colorschememapping.xml" />
+    <Content Include="Upload\1\2\2\1\files\106.files\filelist.xml" />
+    <Content Include="Upload\1\2\2\1\files\106.files\header.html" />
+    <Content Include="Upload\1\2\2\1\files\106.html" />
     <Content Include="Views\web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -793,8 +807,6 @@
     <Content Include="Upload\1\1\1\1\files\8_answer.files\themedata.thmx" />
     <Content Include="Upload\1\1\1\1\files\9.files\themedata.thmx" />
     <Content Include="Upload\1\1\1\1\files\9_answer.files\themedata.thmx" />
-    <Content Include="Upload\1\1\1\1\填空题（8个）.docx" />
-    <Content Include="Upload\1\1\1\1\选择题（15个）.docx" />
     <Content Include="Upload\1\1\2\1\16.docx" />
     <Content Include="Upload\1\1\2\1\16_answer.docx" />
     <Content Include="Upload\1\1\2\1\17.docx" />
@@ -834,7 +846,6 @@
     <Content Include="Upload\1\1\2\1\files\22_answer.files\themedata.thmx" />
     <Content Include="Upload\1\1\2\1\files\23.files\themedata.thmx" />
     <Content Include="Upload\1\1\2\1\files\23_answer.files\themedata.thmx" />
-    <Content Include="Upload\1\1\2\1\填空题（8个）.docx" />
     <Content Include="Upload\1\1\4\1\32.docx" />
     <Content Include="Upload\1\1\4\1\32_answer.docx" />
     <Content Include="Upload\1\1\4\1\33.docx" />
@@ -860,7 +871,6 @@
     <Content Include="Upload\1\1\4\1\files\35.files\oledata.mso" />
     <Content Include="Upload\1\1\4\1\files\35.files\themedata.thmx" />
     <Content Include="Upload\1\1\4\1\files\35_answer.files\themedata.thmx" />
-    <Content Include="Upload\1\1\4\1\回答下列问题（4个）.docx" />
     <Content Include="Upload\1\1\6\1\24.docx" />
     <Content Include="Upload\1\1\6\1\24_answer.docx" />
     <Content Include="Upload\1\1\6\1\25.docx" />
@@ -913,14 +923,22 @@
     <Content Include="Upload\1\1\6\1\files\31_answer.files\image001.wmz" />
     <Content Include="Upload\1\1\6\1\files\31_answer.files\oledata.mso" />
     <Content Include="Upload\1\1\6\1\files\31_answer.files\themedata.thmx" />
-    <Content Include="Upload\1\1\6\1\完成下列方程式（书写化学反应方程式或离子反应方程式均可）（8个）.docx" />
     <Content Include="Upload\1\1\7\1\36.docx" />
     <Content Include="Upload\1\1\7\1\36_answer.docx" />
     <Content Include="Upload\1\1\7\1\files\36.files\image001.wmz" />
     <Content Include="Upload\1\1\7\1\files\36.files\oledata.mso" />
     <Content Include="Upload\1\1\7\1\files\36.files\themedata.thmx" />
     <Content Include="Upload\1\1\7\1\files\36_answer.files\themedata.thmx" />
-    <Content Include="Upload\1\1\7\1\计算题（1个）.docx" />
+    <Content Include="Upload\1\2\1\1\106.docx" />
+    <Content Include="Upload\1\2\1\1\files\106.files\image001.wmz" />
+    <Content Include="Upload\1\2\1\1\files\106.files\oledata.mso" />
+    <Content Include="Upload\1\2\1\1\files\106.files\themedata.thmx" />
+    <Content Include="Upload\1\2\1\2\106.docx" />
+    <Content Include="Upload\1\2\1\2\files\106.files\image001.wmz" />
+    <Content Include="Upload\1\2\1\2\files\106.files\oledata.mso" />
+    <Content Include="Upload\1\2\1\2\files\106.files\themedata.thmx" />
+    <Content Include="Upload\1\2\2\1\106.docx" />
+    <Content Include="Upload\1\2\2\1\files\106.files\themedata.thmx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
