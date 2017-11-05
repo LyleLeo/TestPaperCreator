@@ -230,6 +230,8 @@ namespace TestPaperCreator.DAL.TestPaperService
         /// <returns>成功或失败</returns>
         public static void InsertQuestion(int course, int questiontype, int section, int difficulty, string content,int questionid)
         {
+            content = content.Replace("'", " ");
+            content = content.Replace('"', ' ');
             string sql = "insert into Questions (Type, Course, Section, Difficulty, Weight, Time, Flag,Content) values (" + questiontype + "," + course + "," + section + "," + difficulty + ",0,'" + DateTime.Now.ToShortDateString() + "',1,'"+content.ToString()+"')";
             try
             {
