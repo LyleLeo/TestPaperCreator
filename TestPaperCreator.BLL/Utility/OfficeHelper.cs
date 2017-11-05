@@ -447,7 +447,7 @@ namespace TestPaperCreator.BLL.OfficeHelper
         {
             Application word = new Application();
             var sourceFile = new FileInfo(path);
-            Document document = word.Documents.Open(sourceFile.FullName);
+            var document = word.Documents.Open(sourceFile.FullName);
             string newFileName = sourceFile.FullName.Replace(".docx", ".html");
             string abspath = Path.GetDirectoryName(newFileName);
             if(!Directory.Exists(abspath + "\\files\\"))
