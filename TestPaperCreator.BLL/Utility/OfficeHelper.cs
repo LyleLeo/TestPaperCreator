@@ -244,7 +244,7 @@ namespace TestPaperCreator.BLL.OfficeHelper
                         wh.InsertText(arrays[i]);
                         wh.SaveAs(filepath + id.ToString() + ".docx");
                         wh.Close();
-                        DAL.TestPaperService.TestPaperService.InsertQuestion(question.Course, question.Type, question.Section, question.Difficulty, arrays[i].Trim(),id);
+                        //DAL.TestPaperService.TestPaperService.InsertQuestion(question.Course, question.Type, question.Section, question.Difficulty, arrays[i].Trim(),id);
                     }
                     else
                     {

@@ -301,10 +301,10 @@
                 var year = date.getFullYear()
                 var month = date.getMonth() + 1
                 var day = date.getDate()
-                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[0] + "'>A卷</a>"
-                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[1] + "'>A卷答案</a>"
-                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[2] + "'>B卷</a>"
-                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result[3] + "'>B卷答案</a>"
+                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result["finalfileA"] + "'>A卷</a>"
+                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result["finalfileAanswer"] + "'>A卷答案</a>"
+                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result["finalfileB"] + "'>B卷</a>"
+                html += "<a target='_blank' class='btn btn-default' href='" + localhostPath + "/Upload/Results/" + year + month + day + "/" + result["finalfileBanswer"] + "'>B卷答案</a>"
                 html += "<a target='_blank' class='btn btn-default' onclick='edit()'>编辑</a>"
                 html += "<a target='_blank' class='btn btn-danger pull-right' onclick='Confirm()'>确认试题</a>"
                 $("#footer").html(html);

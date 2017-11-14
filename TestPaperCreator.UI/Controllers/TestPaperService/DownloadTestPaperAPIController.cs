@@ -73,7 +73,7 @@ namespace TestPaperCreator.Controllers.TestPaperService
         #region 生成试卷
         [HttpPost]
         [Route("api/DownloadTestPaperAPI/Generate/")]
-        public List<string> Generate(dynamic obj)
+        public Dictionary<string,string> Generate(dynamic obj)
         {
             string rootpath = HttpContext.Current.Request.MapPath("/");
             JArray questionlist = obj.questionlist;
@@ -149,11 +149,16 @@ namespace TestPaperCreator.Controllers.TestPaperService
             File.Copy(resultnameB, b, true);
             File.Copy(resultnameBanswer, ba, true);
             List<string> filelist = new List<string>();
+            Dictionary<string, string> result = new Dictionary<string, string>();
+            result.Add("finalfileA", finalfileA);
+            result.Add("finalfileAanswer", finalfileAanswer);
+            result.Add("finalfileB", finalfileB);
+            result.Add("finalfileBanswer", finalfileBanswer);
             filelist.Add(finalfileA);
             filelist.Add(finalfileAanswer);
             filelist.Add(finalfileB);
             filelist.Add(finalfileBanswer);
-            return filelist;
+            return result;
         }
         #endregion
 

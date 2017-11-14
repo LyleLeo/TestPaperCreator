@@ -9,6 +9,7 @@ using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml.Vml.Office;
+using DocumentFormat.OpenXml.Drawing.Pictures;
 
 using OpenXmlPowerTools;
 
@@ -42,6 +43,13 @@ namespace TestPaperCreator.BLL.Utility
             {
                 throw e;
             }
+        }
+        #endregion
+
+        #region 查询picID
+        public static string GetPicRid(DocumentFormat.OpenXml.Drawing.Pictures.Picture pic)
+        {
+            return pic.BlipFill.Blip.Embed.Value;
         }
         #endregion
 
@@ -105,7 +113,7 @@ namespace TestPaperCreator.BLL.Utility
         /// <param name="filepath">文档路径</param>
         /// <param name="paragraph">待插入的段落</param>
         /// <param name="wordprocessingDocument">源文件对象</param>
-        private static void OpenAndAddParagraphToWordDocument(string filepath, Paragraph paragraph, WordprocessingDocument wordprocessingDocument, List<string> objridlist, List<string> imgridlist)
+        private static void OpenAndAddParagraphToWordDocument(string filepath, Paragraph paragraph, WordprocessingDocument wordprocessingDocument, List<string> objridlist, List<string> imgridlist, List<string> picridlist)
         {
             //打开目标文件
             WordprocessingDocument distwordprocessingDocument = WordprocessingDocument.Open(filepath, true);
@@ -121,7 +129,7 @@ namespace TestPaperCreator.BLL.Utility
                 }
                 objridlist.Add(rid);
             }
-            //遍历图片内容
+            //遍历img内容
             foreach (ImageData imagedata in paragraph.Descendants<ImageData>())
             {
                 string rid = GetImageID(imagedata);
@@ -132,6 +140,17 @@ namespace TestPaperCreator.BLL.Utility
                     distwordprocessingDocument.MainDocumentPart.AddPart(ip.OpenXmlPart, rid);
                 }
                 imgridlist.Add(rid);
+            }
+            //遍历pic内容
+            foreach (DocumentFormat.OpenXml.Drawing.Pictures.Picture pic in paragraph.Descendants<DocumentFormat.OpenXml.Drawing.Pictures.Picture>())
+            {
+                string rid = GetPicRid(pic);
+                if (!picridlist.Contains(rid))
+                {
+                    IdPartPair ip = wordprocessingDocument.MainDocumentPart.Parts.Single(p => p.RelationshipId == rid);
+                    distwordprocessingDocument.MainDocumentPart.AddPart(ip.OpenXmlPart, rid);
+                }
+                picridlist.Add(rid);
             }
             //摄氏度后面的字符跟的太近了，所以遇到摄氏度的时候就要增加两个空格调远一点
             foreach (Run r in paragraph.Descendants<Run>())
@@ -187,17 +206,17 @@ namespace TestPaperCreator.BLL.Utility
         /// <param name="maxid">当前数据库中题目最大ID</param>
         public static void SplitDocx(string file, string name, MODEL.TestPaper.Question question)
         {
-            int maxid;
-            if (question.ID == 0)
-            {
-                //获取数据库中最大ID
-                maxid = DAL.TestPaperService.TestPaperService.GetMaxQuestionID();
-                maxid += 1;//从最大ID+1开始新增题目
-            }
-            else
-            {
-                maxid = question.ID;
-            }
+            int maxid = 0;
+            //if (question.ID == 0) //新增
+            //{
+            //    //获取数据库中最大ID
+            //    maxid = DAL.TestPaperService.TestPaperService.GetMaxQuestionID();
+            //    maxid += 1;//从最大ID+1开始新增题目
+            //}
+            //else //修改
+            //{
+            //    maxid = question.ID;
+            //}
             WordprocessingDocument wordprocessingDocument = WordprocessingDocument.Open(file + name, true);
             Body body = wordprocessingDocument.MainDocumentPart.Document.Body;
             int flag = 0;//标记当前段落是问题还是答案，偶数为问题，奇数为答案，从偶数开始。
@@ -205,19 +224,30 @@ namespace TestPaperCreator.BLL.Utility
             StringBuilder sb = new StringBuilder();//内容容器
             List<string> imgridlist = new List<string>();
             List<string> objridlist = new List<string>();
+            List<string> picridlist = new List<string>();
+            int newquestionid = 0;
             foreach (Paragraph p in body.Descendants<Paragraph>().ToList())
             {
                 if (flag % 2 == 0)
                 {
                     if (documentisend)
                     {
-                        CreateDocx(file, maxid.ToString());
+                        DAL.TestPaperService.TestPaperService.InsertQuestion(question.Course, question.Type, question.Section, question.Difficulty);
+                        newquestionid = DAL.TestPaperService.TestPaperService.GetMaxQuestionID();
+                        DAL.TestPaperService.TestPaperService.UpdateMajorQuestion(newquestionid);
+                        CreateDocx(file, newquestionid.ToString());
                         documentisend = false;
+                    }
+                    if (maxid != newquestionid)
+                    {
+                        maxid = newquestionid;
                     }
                     if (p.InnerText == "@")
                     {
+                        //结束一道题之后刷新图片附件列表
                         imgridlist = new List<string>();
                         objridlist = new List<string>();
+                        picridlist = new List<string>();
                         documentisend = true;
                         flag++;
                         //try
@@ -230,20 +260,23 @@ namespace TestPaperCreator.BLL.Utility
                         //}
                         if(question.ID == 0)
                         {
-                            DAL.TestPaperService.TestPaperService.InsertQuestion(question.Course, question.Type, question.Section, question.Difficulty, sb.ToString().Trim(), maxid);
+                            List<string> condition = new List<string>();
+                            condition.Add("Content");
+                            condition.Add(sb.ToString().Trim());
+                            DAL.TestPaperService.TestPaperService.UpdateQuestion(maxid, condition);
                         }
                         else
                         {
                             List<string> condition = new List<string>();
                             condition.Add("Content");
                             condition.Add(sb.ToString().Trim());
-                            DAL.TestPaperService.TestPaperService.UpdateQuestion(maxid, condition);
+                            DAL.TestPaperService.TestPaperService.UpdateQuestion(question.ID, condition);
                         }
                         
                         sb.Length = 0;//清空stringbuilder
                         continue;
                     }
-                    OpenAndAddParagraphToWordDocument(file + maxid.ToString() + ".docx", p, wordprocessingDocument, objridlist, imgridlist);
+                    OpenAndAddParagraphToWordDocument(file + maxid.ToString() + ".docx", p, wordprocessingDocument, objridlist, imgridlist, picridlist);
                     sb.Append(p.InnerText);
                 }
                 else
@@ -267,10 +300,10 @@ namespace TestPaperCreator.BLL.Utility
                         documentisend = true;
                         flag++;
                         //OfficeHelper.WordDocumentMerger.ConvertDocxToHtml(file + maxid.ToString() + "_answer.docx");
-                        maxid++;
+                        
                         continue;
                     }
-                    OpenAndAddParagraphToWordDocument(file + maxid.ToString() + "_answer.docx", p, wordprocessingDocument, objridlist, imgridlist);
+                    OpenAndAddParagraphToWordDocument(file + maxid.ToString() + "_answer.docx", p, wordprocessingDocument, objridlist, imgridlist, picridlist);
                 }
             }
             wordprocessingDocument.Close();
@@ -317,7 +350,6 @@ namespace TestPaperCreator.BLL.Utility
                     //Paragraph refparagraph = paperbodyobj.MainDocumentPart.RootElement.Descendants<Paragraph>().Last();
                     foreach (EmbeddedObject embedobj in oxe.Descendants<EmbeddedObject>())
                     {
-
                         foreach (OleObject oleobject in embedobj.Descendants<OleObject>())
                         {
                             string rid = oleobject.Id;
@@ -330,6 +362,12 @@ namespace TestPaperCreator.BLL.Utility
                             IdPartPair imgrel = datiobj.MainDocumentPart.Parts.Single(i => i.RelationshipId == rid);
                             paperheadobj.MainDocumentPart.AddPart(imgrel.OpenXmlPart, rid);
                         }
+                    }
+                    foreach(DocumentFormat.OpenXml.Drawing.Pictures.Picture pic in oxe.Descendants<DocumentFormat.OpenXml.Drawing.Pictures.Picture>())
+                    {
+                        string rid = GetPicRid(pic);
+                        IdPartPair picrel = datiobj.MainDocumentPart.Parts.Single(i => i.RelationshipId == rid);
+                        paperheadobj.MainDocumentPart.AddPart(picrel.OpenXmlPart, rid);
                     }
                     paperheadobj.MainDocumentPart.Document.Body.AppendChild(oxe.CloneNode(true));
                 }
@@ -571,15 +609,15 @@ namespace TestPaperCreator.BLL.Utility
                             maxshapetype++;
                         }
                     }
-                    foreach (OpenXmlElement b in p.Descendants<BookmarkStart>())
+                    foreach (BookmarkStart b in p.Descendants<BookmarkStart>())
                     {
                         b.Remove();
                     }
-                    foreach (OpenXmlElement b in p.Descendants<BookmarkEnd>())
+                    foreach (BookmarkEnd b in p.Descendants<BookmarkEnd>())
                     {
                         b.Remove();
                     }
-                    Paragraph refparagraph = paperbodyobj.MainDocumentPart.RootElement.Descendants<Paragraph>().Last();
+                    //Paragraph refparagraph = paperbodyobj.MainDocumentPart.RootElement.Descendants<Paragraph>().Last();
                     foreach (EmbeddedObject embedobj in p.Descendants<EmbeddedObject>())
                     {
                         foreach (OleObject oleobject in embedobj.Descendants<OleObject>())
@@ -602,6 +640,14 @@ namespace TestPaperCreator.BLL.Utility
                             paperbodyobj.MainDocumentPart.AddPart(imgrel.OpenXmlPart, "rId" + (maxrid + 1).ToString());
                             maxrid++;
                         }
+                    }
+                    foreach(DocumentFormat.OpenXml.Drawing.Pictures.Picture pic in p.Descendants<DocumentFormat.OpenXml.Drawing.Pictures.Picture>())
+                    {
+                        string rid = GetPicRid(pic);
+                        IdPartPair ip = xiaotiobj.MainDocumentPart.Parts.Single(pa => pa.RelationshipId == rid);
+                        paperbodyobj.MainDocumentPart.AddPart(ip.OpenXmlPart, "rId" + (maxrid + 1).ToString());
+                        pic.BlipFill.Blip.Embed.Value = "rId" + (maxrid+1).ToString();
+                        maxrid++;
                     }
                     paperbodyobj.MainDocumentPart.RootElement.GetFirstChild<Body>().AppendChild(p.CloneNode(true));
                     //paperbodyobj.MainDocumentPart.Document.Body.InsertAfter<Paragraph>((Paragraph)p.CloneNode(true), refparagraph);
@@ -777,6 +823,14 @@ namespace TestPaperCreator.BLL.Utility
                             paperbodyobj.MainDocumentPart.AddPart(imgrel.OpenXmlPart, "rId" + (maxrid + 1).ToString());
                             maxrid++;
                         }
+                    }
+                    foreach (DocumentFormat.OpenXml.Drawing.Pictures.Picture pic in p.Descendants<DocumentFormat.OpenXml.Drawing.Pictures.Picture>())
+                    {
+                        string rid = GetPicRid(pic);
+                        IdPartPair ip = xiaotiobj.MainDocumentPart.Parts.Single(pa => pa.RelationshipId == rid);
+                        paperbodyobj.MainDocumentPart.AddPart(ip.OpenXmlPart, "rId" + (maxrid + 1).ToString());
+                        pic.BlipFill.Blip.Embed.Value = "rId" + (maxrid + 1).ToString();
+                        maxrid++;
                     }
                     paperbodyobj.MainDocumentPart.RootElement.GetFirstChild<Body>().AppendChild(p.CloneNode(true));
                     //paperbodyobj.MainDocumentPart.Document.Body.InsertAfter<Paragraph>((Paragraph)p.CloneNode(true), refparagraph);
