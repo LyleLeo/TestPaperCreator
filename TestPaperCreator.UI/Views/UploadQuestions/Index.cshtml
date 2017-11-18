@@ -146,6 +146,7 @@
 
         uploader.on('uploadSuccess', function (file) {
             $('#' + file.id).find('p.state').text('已上传');
+            window.location.reload()
         });
 
         uploader.on('uploadError', function (file, reason) {
