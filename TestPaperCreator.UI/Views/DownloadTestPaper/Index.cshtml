@@ -428,7 +428,7 @@
         $.each($(".container").children("div"), function (index, obj) {
             if ($(obj).attr("type") == "step") {
                 $(obj).remove()
-                $("#final").find("input").val("")
+                //$("#final").find("input").val("")
             }
         })
         var html = ""
@@ -795,13 +795,21 @@
 
             },
             success: function (result) {
-                var curWwwPath = window.document.location.href;    //获取当前url
-                var pathName = window.document.location.pathname;
-                var pos = curWwwPath.indexOf(pathName);
-                var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
-                var html = ""
-                $(obj).parent().prev().children("iframe").eq(0).attr("src", localhostPath + '/Upload/' + result.Course + '/' + result.Section + '/' + result.Type + '/' + result.Difficulty + '/files/' + result.ID + '.html' + '?new=' + Math.random())
-                $(obj).parent().prev().children("iframe").eq(0).attr("id", result.ID)
+                if (result.ID != 0)
+                {
+                    var curWwwPath = window.document.location.href;    //获取当前url
+                    var pathName = window.document.location.pathname;
+                    var pos = curWwwPath.indexOf(pathName);
+                    var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
+                    var html = ""
+                    $(obj).parent().prev().children("iframe").eq(0).attr("src", localhostPath + '/Upload/' + result.Course + '/' + result.Section + '/' + result.Type + '/' + result.Difficulty + '/files/' + result.ID + '.html' + '?new=' + Math.random())
+                    $(obj).parent().prev().children("iframe").eq(0).attr("id", result.ID)
+                }
+                else
+                {
+                    alert("没有多余的题")
+                }
+                
             }
         })
     }

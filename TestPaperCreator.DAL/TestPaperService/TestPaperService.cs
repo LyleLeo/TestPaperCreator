@@ -402,7 +402,7 @@ namespace TestPaperCreator.DAL.TestPaperService
             int section = paper.paperproperty.section;
             int questiontype = paper.paperproperty.questiontype;
             int difficulty = paper.paperproperty.difficulty;
-            string sql = "select QuestionID from Major_Question where Questionid in (select id from Questions where Course = " + course + " and Section = " + section + " and Difficulty = " + difficulty + " and Type = " + questiontype + ") and Weight in(select min(Weight) from Major_Question where Questionid in (select id from Questions where Course = " + course + " and Section = " + section + " and Difficulty = " + difficulty + " and Type = " + questiontype + "))";
+            string sql = "select QuestionID from Major_Question where Questionid in (select id from Questions where Course = " + course + " and Section = " + section + " and Difficulty = " + difficulty + " and Type = " + questiontype + ") and Weight = (select min(Weight) from Major_Question where Questionid in (select id from Questions where Course = " + course + " and Section = " + section + " and Difficulty = " + difficulty + " and Type = " + questiontype + "))";
             //string sql = "select ID from Questions where Course = " + course + " and Section =" + section + " and Difficulty =" + difficulty + " and Type = " + questiontype + " and Weight in(select MIN(Weight) from Questions)  and Flag=1";
             DataSet results = SqlHelper.ExecuteDataset(conn, CommandType.Text, sql);
             List<int> a = new List<int>();
@@ -410,13 +410,25 @@ namespace TestPaperCreator.DAL.TestPaperService
             {
                 a.Add((int)dr[0]);
             }
-            Random rd = new Random();
-            int result = rd.Next(0, a.Count);
-            while (oldidlist.Contains(a[result]))
+            a = a.Except(oldidlist).ToList();
+            if (a.Count != 0)
             {
-                result = rd.Next(0, a.Count);
+                Random rd = new Random();
+                int result = rd.Next(0, a.Count);
+                while (oldidlist.Contains(a[result]))
+                {
+                    result = rd.Next(0, a.Count);
+                }
+                return GetAQuestionByID(a[result]);
             }
-            return GetAQuestionByID(a[result]);
+            else
+            {
+                MODEL.TestPaper.Question question = new MODEL.TestPaper.Question();
+                question.ID = 0;
+                return question;
+            }
+                
+            
         }
         #endregion
 
