@@ -61,7 +61,6 @@
         var pos = curWwwPath.indexOf(pathName);
         var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
         localhostPath = localhostPath + "Upload/"
-        console.log(localhostPath)
         $.ajax({
             url: "/api/UploadQuestionsAPI/ConverDocxToHtml/",
             type: "POST",
@@ -70,7 +69,6 @@
                 $("#convert").text("正在转换中")
             },
             success: function () {
-                console.log("asf")
                 $("#convert").text("转换成功")
             },
         })
@@ -106,7 +104,6 @@
                 extensions: 'docx,,'
             }
         });
-        console.log(111111)
         uploader.on("error", function (type) {
             if (type == "Q_TYPE_DENIED") {
                 alert("ERROR")
@@ -114,9 +111,8 @@
         });
         // 当有文件添加进来的时候
         uploader.on('fileQueued', function (file) {
-            console.log(11111111)
             $list.append('<div id="' + file.id + '" class="item">' +
-                '<h4 class="info">' + file.name + '<span class="glyphicon glyphicon-remove" ></span></h4>' +
+                '<h4 class="info">' + file.name + '</h4>' +
                 //'<span class="glyphicon glyphicon-remove"></span>' +
                 '<p class="state">等待上传...</p>' +
             '</div>');

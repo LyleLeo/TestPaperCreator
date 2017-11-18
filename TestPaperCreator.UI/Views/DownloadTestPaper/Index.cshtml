@@ -217,7 +217,6 @@
             type: "POST",
             data: { "": conditionlist},
             success: function (result) {
-                console.log(result)
                 $(obj).parent().parent().parent().children("label").eq(0).html(result[1] + "，" + result[2] + "，" + result[3] + "，" + result[4] + " 的AB卷一共可选题量为：" + result[5] )
             },
         })
@@ -329,12 +328,10 @@
 
     function Confirm() {
         var majorname = $("#final_majorname").find("option:selected").val()
-        console.log(majorname)
         var questionlist = []
         $.each($("#testpapertable").find("iframe"), function (index, obj) {
             questionlist.push($(obj).attr("id"))
         })
-        console.log(questionlist)
         $.ajax({
             url: "/api/DownloadTestPaperAPI/Confirm/",
             type: "POST",
@@ -371,7 +368,6 @@
         Insert_Detail_To_Final(obj)
         var next_id = $(obj).attr("id").split("_")[1]
         if ($(obj).parent().parent().parent().children("div").last().attr("id") == $(obj).parent().parent().attr("id")) {
-            //$("[type='step']").show()
             $.each($("#final").children("div").eq(1).children("table"), function (index, table) {
                 $.each($(table).children("tbody").children("tr"), function (s_index, tr) {
                     if ($(tr).children("td").last().children("button").eq(0).attr("id") == "Del_Detail") {
@@ -424,9 +420,6 @@
         $("#final").children("div").eq(1).children("table").remove()
         var basiclist = ["schoolname", "collegename", "majorname", "schoolyear", "term", "testtype", "course", "volume", "length", "testmethod", "grade", "class"]
         $("#basic_form").hide()
-        //var basic_html = ""
-        //basic_html = $("#basic_form").children("div").eq(1).children(".row").eq(0).prop("outerHTML") + $("#basic_form").children("div").eq(1).children(".row").eq(1).prop("outerHTML")
-        //$("#final").children("div").eq(1).html(basic_html)
         var i = 0
         for (i; i < basiclist.length; i++) {
             $("#final_" + basiclist[i]).val($("#" + basiclist[i]).val())
@@ -531,7 +524,7 @@
             }
         })
         if (isrepeat == true) {
-            alert("no")
+            alert("已有重复项")
             return
         }
         if (questiontype == 0) {
@@ -727,9 +720,7 @@
         $.ajax({
             url: "/api/DownloadTestPaperAPI/GetQuestionID/",
             type: "POST",
-            //contentType: 'application/json',
             data: { "": paperlist },
-            //data: JSON.stringify(paperlist),
             beforeSend: function () {
 
             },
@@ -747,7 +738,6 @@
                 })
                 $("#testpapertable").children("tbody").eq(0).html(html)
                 $("#final").hide()
-                //window.open(localhostPath + "/Upload/Output/out.docx")
             }
         })
     }
@@ -783,7 +773,6 @@
         $.each($(obj).parent().parent().parent().find("iframe"), function (idx, iframeobj) {
             oldidlist.push($(iframeobj).attr("id"))
         })
-        //var oldquestionid = $(obj).parent().prev().children("iframe").attr("id")
         var courseid = $(obj).parent().parent().next().children("td").eq(0).attr("id")
         var sectionid = $(obj).parent().parent().next().children("td").eq(1).attr("id")
         var questiontypeid = $(obj).parent().parent().next().children("td").eq(2).attr("id")
@@ -802,8 +791,6 @@
             type: "POST",
             contentType: 'application/json',
             data: JSON.stringify({ oldidlist: oldidlist, paper: paper }),
-            //data: { "": paper,"": oldquestionid},
-            //data: JSON.stringify(paperlist),
             beforeSend: function () {
 
             },
@@ -814,7 +801,6 @@
                 var localhostPath = curWwwPath.substring(0, pos) + "/";   //项目根路径
                 var html = ""
                 $(obj).parent().prev().children("iframe").eq(0).attr("src", localhostPath + '/Upload/' + result.Course + '/' + result.Section + '/' + result.Type + '/' + result.Difficulty + '/files/' + result.ID + '.html' + '?new=' + Math.random())
-                //window.open(localhostPath + "/Upload/Output/out.docx")
                 $(obj).parent().prev().children("iframe").eq(0).attr("id", result.ID)
             }
         })

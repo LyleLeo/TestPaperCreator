@@ -165,7 +165,6 @@
         var section = $(obj).parent().parent().children("td").eq(5).text()
         var type = $(obj).parent().parent().children("td").eq(7).text()
         var difficulty = $(obj).parent().parent().children("td").eq(9).text()
-        console.log(localhostPath)
         if (isanswer == 0) {
             localhostPath += "Upload/" + course + "/" + section + "/" + type + "/" + difficulty + "/" + id + ".docx"
         }
@@ -173,11 +172,9 @@
             localhostPath += "Upload/" + course + "/" + section + "/" + type + "/" + difficulty + "/" + id + "_answer.docx"
         }
         window.location.href=localhostPath
-        console.log(localhostPath)
     }
     function Del(obj) {
         var id = parseInt($(obj).parent().parent().children("td").eq(1).text())
-        alert(id)
         $.ajax({
             url: "/api/ViewQuestionAPI/DeleteQuestion/",
             type: "POST",
@@ -188,6 +185,7 @@
             },
             success: function (result) {
                 if (result == true) {
+                    alert("删除成功")
                     window.location.reload()
                 }
                 else {
@@ -196,7 +194,6 @@
                 }
             }
         })
-        //$(obj).parent().parent().remove()
     }
     function getAttarchmentPath(d) {
         var curWwwPath = window.document.location.href;

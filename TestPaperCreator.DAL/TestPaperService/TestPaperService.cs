@@ -348,8 +348,15 @@ namespace TestPaperCreator.DAL.TestPaperService
                     c.Add(r);
                     i++;
                 }
-                paperDic.Add(questiontype, b);
-                paperDic[questiontype] = b;
+                if(paperDic.ContainsKey(questiontype))
+                {
+                    paperDic[questiontype] = paperDic[questiontype].Concat(b).ToList();
+                }
+                else
+                {
+                    paperDic.Add(questiontype, b);
+                }
+                //
             }
             return paperDic;
         }
@@ -647,8 +654,11 @@ namespace TestPaperCreator.DAL.TestPaperService
         {
             string content = condition[1].Replace("\'", " ");
             content = content.Replace("\"", " ");
-            content = content.Replace("false", " ");            
-            string sql = "update Questions set " + condition[0] + " = '" + content + "' where id = " + questionid;
+            content = content.Replace("false", " ");
+            content = content.Replace("?", " ");
+            content = content.Replace("？", " ");
+            content = content.Replace(" ", "");
+            string sql = "update Questions set " + condition[0] + " = '" + content.Trim() + "' where id = " + questionid;
             SqlHelper.ExecuteNonQuery(conn, CommandType.Text, sql);
         }
         #endregion

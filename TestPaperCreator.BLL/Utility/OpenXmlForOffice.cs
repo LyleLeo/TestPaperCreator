@@ -9,9 +9,8 @@ using System.Text;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml.Vml.Office;
-using DocumentFormat.OpenXml.Drawing.Pictures;
-
 using OpenXmlPowerTools;
+using System.Threading;
 
 namespace TestPaperCreator.BLL.Utility
 {
@@ -76,7 +75,7 @@ namespace TestPaperCreator.BLL.Utility
         /// <param name="paragraph">待插入的段落</param>
         /// <param name="wordprocessingDocument">源文档对象</param>
         /// <param name="refParagraph">定位段落，待插入的段落会插入它后面</param>
-        private static void OpenAndAddParagraphToWordDocument(string filepath, Paragraph paragraph, WordprocessingDocument wordprocessingDocument, Paragraph refParagraph)
+        private static void OpenAndAddParagraphToWordDocument(string filepath, OpenXmlElement paragraph, WordprocessingDocument wordprocessingDocument, OpenXmlElement refParagraph)
         {
             //打开目标文件
             WordprocessingDocument distwordprocessingDocument = WordprocessingDocument.Open(filepath, true);
@@ -113,7 +112,7 @@ namespace TestPaperCreator.BLL.Utility
         /// <param name="filepath">文档路径</param>
         /// <param name="paragraph">待插入的段落</param>
         /// <param name="wordprocessingDocument">源文件对象</param>
-        private static void OpenAndAddParagraphToWordDocument(string filepath, Paragraph paragraph, WordprocessingDocument wordprocessingDocument, List<string> objridlist, List<string> imgridlist, List<string> picridlist)
+        private static void OpenAndAddParagraphToWordDocument(string filepath, OpenXmlElement paragraph, WordprocessingDocument wordprocessingDocument, List<string> objridlist, List<string> imgridlist, List<string> picridlist)
         {
             //打开目标文件
             WordprocessingDocument distwordprocessingDocument = WordprocessingDocument.Open(filepath, true);
@@ -152,24 +151,29 @@ namespace TestPaperCreator.BLL.Utility
                 }
                 picridlist.Add(rid);
             }
-            //摄氏度后面的字符跟的太近了，所以遇到摄氏度的时候就要增加两个空格调远一点
-            foreach (Run r in paragraph.Descendants<Run>())
-            {
-                if (r.InnerText.Contains("℃"))
-                {
-                    Run run1 = new Run();
+            //如果是表格
+            //if (paragraph.GetType() == typeof(DocumentFormat.OpenXml.Wordprocessing.Table))
+            //{
+                //ReferenceRelationship relation = wordprocessingDocument.DataPartReferenceRelationships.Single(i => i.RelationshipType == "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles");
+            //}
+            ////摄氏度后面的字符跟的太近了，所以遇到摄氏度的时候就要增加两个空格调远一点
+            //foreach (Run r in paragraph.Descendants<Run>())
+            //{
+            //    if (r.InnerText.Contains("℃"))
+            //    {
+            //        Run run1 = new Run();
 
-                    RunProperties runProperties1 = new RunProperties();
-                    RunFonts runFonts1 = new RunFonts() { Hint = FontTypeHintValues.EastAsia };
+            //        RunProperties runProperties1 = new RunProperties();
+            //        RunFonts runFonts1 = new RunFonts() { Hint = FontTypeHintValues.EastAsia };
 
-                    runProperties1.Append(runFonts1);
-                    Text text1 = new Text() { Space = SpaceProcessingModeValues.Preserve };
-                    text1.Text = "  ";
-                    run1.Append(runProperties1);
-                    run1.Append(text1);
-                    paragraph.InsertAfter(run1.CloneNode(true), r);
-                }
-            }
+            //        runProperties1.Append(runFonts1);
+            //        Text text1 = new Text() { Space = SpaceProcessingModeValues.Preserve };
+            //        text1.Text = "  ";
+            //        run1.Append(runProperties1);
+            //        run1.Append(text1);
+            //        paragraph.InsertAfter(run1.CloneNode(true), r);
+            //    }
+            //}
             // Assign a reference to the existing document body.
             Body body = distwordprocessingDocument.MainDocumentPart.Document.Body;
             // Add new text.
@@ -206,6 +210,7 @@ namespace TestPaperCreator.BLL.Utility
         /// <param name="maxid">当前数据库中题目最大ID</param>
         public static void SplitDocx(string file, string name, MODEL.TestPaper.Question question)
         {
+            Thread.Sleep(500);
             int maxid = 0;
             //if (question.ID == 0) //新增
             //{
@@ -219,6 +224,7 @@ namespace TestPaperCreator.BLL.Utility
             //}
             WordprocessingDocument wordprocessingDocument = WordprocessingDocument.Open(file + name, true);
             Body body = wordprocessingDocument.MainDocumentPart.Document.Body;
+            // style = wordprocessingDocument.MainDocumentPart.StyleDefinitionsPart();
             int flag = 0;//标记当前段落是问题还是答案，偶数为问题，奇数为答案，从偶数开始。
             bool documentisend = true;//标记一个文档是否插入完成
             StringBuilder sb = new StringBuilder();//内容容器
@@ -226,8 +232,9 @@ namespace TestPaperCreator.BLL.Utility
             List<string> objridlist = new List<string>();
             List<string> picridlist = new List<string>();
             int newquestionid = 0;
-            foreach (Paragraph p in body.Descendants<Paragraph>().ToList())
+            foreach (OpenXmlElement p in body.ChildElements)
             {
+                if (p.GetType() == typeof(DocumentFormat.OpenXml.Wordprocessing.SectionProperties)) continue;
                 if (flag % 2 == 0)
                 {
                     if (documentisend)
@@ -242,7 +249,7 @@ namespace TestPaperCreator.BLL.Utility
                     {
                         maxid = newquestionid;
                     }
-                    if (p.InnerText == "@")
+                    if (p.InnerText.Trim() == "@")
                     {
                         //结束一道题之后刷新图片附件列表
                         imgridlist = new List<string>();
@@ -293,7 +300,7 @@ namespace TestPaperCreator.BLL.Utility
                         }
                         documentisend = false;
                     }
-                    if (p.InnerText == "@")
+                    if (p.InnerText.Trim() == "@")
                     {
                         imgridlist = new List<string>();
                         objridlist = new List<string>();
@@ -578,7 +585,6 @@ namespace TestPaperCreator.BLL.Utility
             {
                 WordprocessingDocument paperbodyobj = WordprocessingDocument.Open(paperbody_copy, true);
                 WordprocessingDocument xiaotiobj = WordprocessingDocument.Open(file, false);
-                List<Paragraph> xiaotiparagraphlist = xiaotiobj.MainDocumentPart.RootElement.Descendants<Paragraph>().ToList();
                 //加入题号
                 string number = System.IO.Path.GetFileNameWithoutExtension(file);
                 //string number = System.IO.Path.GetFileName(file);
@@ -594,8 +600,9 @@ namespace TestPaperCreator.BLL.Utility
                 run1.Append(text1);
                 xiaotiobj.MainDocumentPart.RootElement.Descendants<Paragraph>().First().InsertBefore(run1, xiaotiobj.MainDocumentPart.RootElement.Descendants<Paragraph>().First().ChildElements.First<Run>());
                 //xiaotiobj.MainDocumentPart.RootElement.First<Paragraph>().InsertBefore(run1, xiaotiobj.MainDocumentPart.Document.Body.First<Paragraph>().First<Run>)
-                foreach (Paragraph p in xiaotiparagraphlist)
+                foreach (OpenXmlElement p in xiaotiobj.MainDocumentPart.Document.Body.ChildElements)
                 {
+                    if (p.GetType() == typeof(SectionProperties)) continue;
                     if (p.Descendants<Shapetype>().Count() != 0)
                     {
                         foreach (Shapetype st in p.Descendants<Shapetype>())
@@ -884,6 +891,7 @@ namespace TestPaperCreator.BLL.Utility
         }
         #endregion
 
+        #region Docx转Html
         public static void ConverDocxToHtml(string path)
         {
             List<string> pathlist = new List<string>();
@@ -951,6 +959,7 @@ namespace TestPaperCreator.BLL.Utility
                 
             }
         }
+        #endregion
     }
 
 }
