@@ -1,6 +1,8 @@
 # TestPaperCreator
 试卷生成器
 
+word操作的内容在这里 https://github.com/LyleLeo/TestPaperCreator/blob/master/TestPaperCreator.BLL/Utility/OpenXmlForOffice.cs
+
 ## 由于测试数据库服务器虚拟云主机未续费，导致数据库表结构丢失，ECS和域名也相继到期，所以无法提供预览了。
 ## 以下是说明文档中截取的生成试卷界面
 
